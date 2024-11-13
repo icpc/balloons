@@ -70,6 +70,9 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           onChange={(e) => setLogin(e.target.value)}
           disabled={isLoading}
           required
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="false"
         />
         <label htmlFor="password">Пароль</label>
         <input

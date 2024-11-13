@@ -28,14 +28,16 @@ java -jar balloons.jar run -c path/to/config
 
 You can customize a few options:
 * We create H2 database that contains a few files. You can control its location by `--database-file=/path/to/h2`, by default it is created
-  in current working directory. [Read more](http://www.h2database.com/html/features.html#database_file_layout) about database files.
-
-  This argument should come **before** `run` and be **the same** in all CLI commands.
+  in current working directory with prefix `h2`. [Read more](http://www.h2database.com/html/features.html#database_file_layout) about database files.
 
 * All customization supported by [Overlay](https://github.com/icpc/live-v3) are supported!
   You likely want to [set problem colors](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md#change-problem-info).
 
-Then navigate in your browser to http://<ip>:<port>/ (by default and from the same machine, http://localhost:8001/). If this service
+> [!IMPORTANT] 
+> When specifying flags, make sure that `-d` / `--database-file` is set **before** command (`run` / `volunteer`) and all other options
+> are set **after** command.
+
+Then navigate in your browser to `http://{ip}:{port}/` (by default and from the same machine, http://localhost:8001/). If this service
 is exposed to the internet, it's strictly recommended to use some reverse proxy like nginx.
 
 Don't forget to add admin user (see below).
@@ -60,6 +62,18 @@ java -jar balloons.jar h2shell
 ```
 
 ## Development
+
+### Frontend
+
+You can launch frontend in development mode:
+
+```bash
+cd frontend/
+pnpm run dev
+```
+
+It will start at port 5173. To avoid CORS-tricks, it proxies `/api/` to `http://localhost:8001`. If backend is located somewhere else,
+set `BACKEND_URL` environment variable. See [vite.config.ts](frontend/vite.config.ts) for details.
 
 ### Build
 
