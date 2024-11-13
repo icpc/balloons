@@ -71,7 +71,8 @@ gradle shadowJar
 
 ## TODO
 
-- [ ] Frontend - add halls
+- [ ] Frontend: fix space between links
+- [ ] Build under newer Javas
 - [ ] CI
 - [ ] Tests
 - [ ] Some docs on how to develop it

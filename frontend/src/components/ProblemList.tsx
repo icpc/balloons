@@ -11,14 +11,14 @@ const ProblemBlock = ({ problem, solves }: { problem: Problem, solves: number })
   </div>, [problem, solves]);
 };
 
-const ProblemList = ({ problems, balloons }: State) => {
+const ProblemList = ({ contest, balloons }: State) => {
   return useMemo(() => (
       <div className="problem-list">
-        {problems.map(problem => (
+        {contest.problems.map(problem => (
           <ProblemBlock key={problem.id} problem={problem} solves={balloons.filter(b => b.problemId === problem.id).length} />
         ))}
       </div>
-  ), [problems, balloons]);
+  ), [contest, balloons]);
 };
 
 export default ProblemList;

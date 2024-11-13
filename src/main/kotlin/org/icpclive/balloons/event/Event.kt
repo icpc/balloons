@@ -15,9 +15,9 @@ data object Reload : Event {
 }
 
 @Serializable
-@SerialName("problemsUpdated")
-data class ProblemsUpdated(val problems: List<Problem>) : Event {
-    override fun applyTo(state: State) = state.copy(problems = problems)
+@SerialName("contestUpdated")
+data class ContestUpdated(val contest: Contest) : Event {
+    override fun applyTo(state: State) = state.copy(contest = contest)
 }
 
 @Serializable

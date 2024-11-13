@@ -12,10 +12,9 @@ import org.icpclive.cds.api.RunResult
 import org.icpclive.cds.util.getLogger
 
 class EventStream(private val balloonRepository: BalloonRepository) {
-    val contest = MutableStateFlow(Contest("Loading", mapOf()))
     private val runs = MutableStateFlow(listOf<Run>())
 
-    private val sink = MutableStateFlow<Pair<State, Event>>(State(listOf(), listOf()) to Reload)
+    private val sink = MutableStateFlow<Pair<State, Event>>(State(Contest("Loading", listOf(), listOf()), listOf()) to Reload)
     val stream = sink.asStateFlow()
 
     /**
@@ -68,26 +67,10 @@ class EventStream(private val balloonRepository: BalloonRepository) {
 
     // This can be written in non-concurrent fashion.
     fun processContestInfo(contestInfo: ContestInfo) {
-        val newContestInfo = Contest(contestInfo)
-        if (newContestInfo != contest.value) {
-            contest.update { newContestInfo }
+        val newContest = Contest(contestInfo)
 
-            // Here something in team info may change. So we rewrite the whole history.
-            sink.update { (state, _) ->
-                val newState =
-                    state.copy(
-                        balloons =
-                            state.balloons.map { balloon ->
-                                balloon.copy(team = newContestInfo.getTeam(balloon.team.id))
-                            },
-                    )
-                newState with Reload
-            }
-        }
-
-        val problems = contestInfo.problems.map { (_, value) -> Problem(value) }.sortedBy { it.alias }
-        if (problems != getState().problems) {
-            updateSink(ProblemsUpdated(problems))
+        if (newContest != getState().contest) {
+            updateSink(ContestUpdated(newContest))
         }
     }
 
@@ -129,7 +112,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
         problemId: String,
         teamId: String,
     ) {
-        val existingBalloon = getState().balloons.find { it.problemId == problemId && it.team.id == teamId }
+        val existingBalloon = getState().balloons.find { it.problemId == problemId && it.teamId == teamId }
         val existingFTS = getState().balloons.find { it.problemId == problemId && it.isFTS }
 
         val actualRun = runs.value.find { it.problemId == problemId && it.teamId == teamId }
@@ -191,7 +174,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
         }
 
     private fun Run.toBalloon(isFTS: Boolean) =
-        Balloon(runId, isFTS, contest.value.getTeam(teamId), problemId, time)
+        Balloon(runId, isFTS, teamId, problemId, time)
             .withDelivery()
 
     private fun Balloon.withDelivery(): Balloon {

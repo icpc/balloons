@@ -6,21 +6,22 @@ import ProblemList from '../components/ProblemList';
 import BalloonList from '../components/BalloonList';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 
-const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
-  const problems = useSelector((state: RootState) => state.problems.items);
-  const balloons = useSelector((state: RootState) => state.balloons.items);
+const BalloonsView = () => {
+  const contest = useSelector((state: RootState) => state.contest);
+  const filteredBalloons = useFilteredBalloons();
 
   const deliveredBalloons = useMemo(() => {
-    return balloons.filter(balloon => balloon.delivered);
-  }, [balloons]);
+    return filteredBalloons.filter(balloon => balloon.delivered);
+  }, [filteredBalloons]);
 
   return (
     <main className="balloons-main">
       <h2 className="sr-only">Доставленные шарики</h2>
-      <div className="contest-name"><strong>{infoHolder.info.contestName}</strong></div>
-      <ProblemList problems={problems} balloons={balloons} />
-      <BalloonList title="Доставлены" balloons={deliveredBalloons} problems={problems}
+      <div className="contest-name"><strong>{contest.name}</strong></div>
+      <ProblemList contest={contest} balloons={filteredBalloons} />
+      <BalloonList title="Доставлены" balloons={deliveredBalloons} contest={contest}
         actions={(balloon) => <span>Доставлен {balloon.takenBy ?? ''}</span>} />
     </main>
   );
@@ -35,7 +36,7 @@ const DeliveredBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
     return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
   }
 
-  return <BalloonsView infoHolder={infoHolder} />
+  return <BalloonsView />
 };
 
 export default DeliveredBalloons;

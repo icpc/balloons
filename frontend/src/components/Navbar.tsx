@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { HTMLProps } from 'react';
+import HallSelector from './HallSelector';
 
 const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) => {
   const location = useLocation();
@@ -13,17 +14,20 @@ const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) =>
 }
 
 const Navbar = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const location = useLocation();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       {!infoHolder.info.login ? (
         <>
           <NavLink to="/login">Вход</NavLink>
-          <NavLink to="/register">Регистрация</NavLink>
+          {infoHolder.info.canRegister && <NavLink to="/register">Регистрация</NavLink>}
         </>
       ) : (
         <>
           {infoHolder.info.canAccess && <>
-            <NavLink to="/queue">Очередь</NavLink>
+            {['/', '/delivered', '/standings'].includes(location.pathname) && <HallSelector />}
+            <NavLink to="/">Очередь</NavLink>
             <NavLink to="/delivered">Доставлено</NavLink>
             <NavLink to="/standings">Таблица</NavLink>
             <NavLink to="/rating">Волонтёры</NavLink>

@@ -6,7 +6,6 @@ export interface InfoHolder {
 };
 
 export interface Info {
-  contestName: string
   canRegister?: boolean
   login?: string
   canAccess?: boolean
@@ -38,20 +37,26 @@ export interface Team {
 export interface Balloon {
   runId: string;
   isFTS: boolean;
-  team: Team;
+  teamId: string;
   problemId: string;
   time: number;
   takenBy: string | null;
   delivered: boolean;
 }
 
-export interface State {
+export interface Contest {
+  name: string;
+  teams: Team[];
   problems: Problem[];
+}
+
+export interface State {
+  contest: Contest;
   balloons: Balloon[];
 }
 
 export type Event =
-  | { type: 'problemsUpdated', problems: Problem[] }
+  | { type: 'contestUpdated', contest: Contest }
   | { type: 'balloonUpdated', balloon: Balloon }
   | { type: 'balloonDeleted', runId: string };
 

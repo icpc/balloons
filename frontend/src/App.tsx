@@ -6,14 +6,13 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Main from './pages/Main'
 import VolunteerAccess from './pages/VolunteerAccess'
 import ActiveBalloons from './pages/ActiveBalloons'
 import { GlobalError } from './components/GlobalError'
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { useDispatch } from 'react-redux';
-import { setProblems } from './store/problemsSlice';
+import { setContest } from './store/contestSlice';
 import { updateBalloon, deleteBalloon, setBalloons } from './store/balloonsSlice';
 import { WebSocketContext } from './contexts/WebSocketContext';
 import DeliveredBalloons from './pages/DeliveredBalloons'
@@ -23,7 +22,7 @@ import Standings from './pages/Standings'
 function AppContent() {
   const dispatch = useDispatch();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
-  const [info, setInfo] = useState<Info>({ contestName: 'Unknown', status: 'loading' });
+  const [info, setInfo] = useState<Info>({ status: 'loading' });
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const setTokenWithStorage = useCallback((newToken: string | null) => {
@@ -77,8 +76,8 @@ function AppContent() {
       
       if ('type' in message) {
         switch (message.type) {
-          case 'problemsUpdated':
-            dispatch(setProblems(message.problems));
+          case 'contestUpdated':
+            dispatch(setContest(message.contest));
             break;
           case 'balloonUpdated':
             dispatch(updateBalloon(message.balloon));
@@ -90,7 +89,7 @@ function AppContent() {
       } else {
         // Handle initial State
         const state = message as State;
-        dispatch(setProblems(state.problems));
+        dispatch(setContest(state.contest));
         dispatch(setBalloons(state.balloons));
       }
     };
@@ -116,8 +115,7 @@ function AppContent() {
     <WebSocketContext.Provider value={ws}>
       <Navbar infoHolder={infoHolder} />
       <Routes>
-        <Route path="/" element={<Main infoHolder={infoHolder} />} />
-        <Route path="/queue" element={<ActiveBalloons infoHolder={infoHolder} />} />
+        <Route path="/" element={<ActiveBalloons infoHolder={infoHolder} />} />
         <Route path="/delivered" element={<DeliveredBalloons infoHolder={infoHolder} />} />
         <Route path="/standings" element={<Standings infoHolder={infoHolder} />} />
         <Route path="/rating" element={<VolunteerRating infoHolder={infoHolder} />} />

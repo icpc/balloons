@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import { InfoHolder, Team } from '../types';
 import { GlobalError } from '../components/GlobalError';
 import ProblemBox from '../components/ProblemBox';
+import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 
 interface TeamStats {
   team: Team;
@@ -12,27 +13,29 @@ interface TeamStats {
 }
 
 const StandingsView = () => {
-  const problems = useSelector((state: RootState) => state.problems.items);
-  const balloons = useSelector((state: RootState) => state.balloons.items);
+  const contest = useSelector((state: RootState) => state.contest);
+  const selectedHall = useSelector((state: RootState) => state.halls.selectedHall);
+  const filteredBalloons = useFilteredBalloons();
 
-  const teamStats = useMemo(() => {
-    // Group balloons by team
-    const statsMap = new Map<string, TeamStats>();
-    
-    balloons.forEach(balloon => {
-      if (!statsMap.has(balloon.team.id)) {
-        statsMap.set(balloon.team.id, {
-          team: balloon.team,
-          solvedProblems: new Set()
-        });
+  const teamStats: TeamStats[] = useMemo(() => {
+    const statsMap = new Map<string, Set<string>>();
+
+    filteredBalloons.forEach(balloon => {
+      if (!statsMap.has(balloon.teamId)) {
+        statsMap.set(balloon.teamId, new Set());
       }
-      statsMap.get(balloon.team.id)!.solvedProblems.add(balloon.problemId);
+      statsMap.get(balloon.teamId)!.add(balloon.problemId);
     });
 
-    // Convert to array and sort by team displayName
-    return Array.from(statsMap.values())
-      .sort((a, b) => a.team.displayName.localeCompare(b.team.displayName));
-  }, [balloons]);
+    return contest.teams
+      .filter(team => !selectedHall || team.hall === selectedHall)
+      .map(team => {
+        return {
+          team,
+          solvedProblems: statsMap.get(team.id) ?? new Set()
+        };
+      });
+  }, [filteredBalloons, contest, selectedHall]);
 
   return (
     <main>
@@ -41,24 +44,24 @@ const StandingsView = () => {
         <thead>
           <tr>
             <th className="team-place">Место</th>
-            {problems.map(problem => (
+            {contest.problems.map(problem => (
               <th className="team-problem" key={problem.id}>{problem.alias}</th>
             ))}
             <th className="team-name">Команда</th>
           </tr>
         </thead>
         <tbody>
-          {teamStats.map((stats) => (
-            <tr key={stats.team.id}>
-              <td className="team-place">{stats.team.displayName}</td>
-              {problems.map(problem => (
+          {teamStats.map(({ team, solvedProblems }) => (
+            <tr key={team.id}>
+              <td className="team-place">{team.displayName}</td>
+              {contest.problems.map(problem => (
                 <td className="team-problem" key={problem.id}>
-                  {stats.solvedProblems.has(problem.id) ? (
+                  {solvedProblems.has(problem.id) ? (
                     <ProblemBox problem={problem} />
                   ) : null}
                 </td>
               ))}
-              <td className="team-name">{stats.team.fullName}</td>
+              <td className="team-name">{team.fullName}</td>
             </tr>
           ))}
         </tbody>

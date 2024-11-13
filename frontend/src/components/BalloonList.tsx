@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { Balloon, Problem } from '../types';
+import { Balloon, Contest, Problem, Team } from '../types';
 import ProblemBox from './ProblemBox';
 
-const BalloonRow = ({ balloon, problem, actions }: {
+const BalloonRow = ({ balloon, problem, team, actions }: {
   balloon: Balloon;
   problem: Problem;
+  team: Team;
   actions: (balloon: Balloon) => React.ReactNode;
 }) => {
   const actionContent = actions(balloon);
@@ -13,19 +14,19 @@ const BalloonRow = ({ balloon, problem, actions }: {
     <div className="balloon-row">
       <ProblemBox problem={problem} />
       {balloon.isFTS ? <span className="fts">★</span> : <span></span>}
-      <span className="team-place">{balloon.team.displayName}</span>
+      <span className="team-place">{team.displayName}</span>
       <div className="actions">{actionContent}</div>
-      <span className="team-name">{balloon.team.fullName}</span>
+      <span className="team-name">{team.fullName}</span>
     </div>
   ), [balloon, problem, actionContent]);
 
   return content;
 };
 
-const BalloonList = ({ title, balloons, problems, actions }: {
+const BalloonList = ({ title, balloons, contest, actions }: {
   title: string;
   balloons: Balloon[];
-  problems: Problem[];
+  contest: Contest;
   actions: (balloon: Balloon) => React.ReactNode;
 }) => {
   if (balloons.length === 0) {
@@ -33,11 +34,18 @@ const BalloonList = ({ title, balloons, problems, actions }: {
   }
 
   const problemsMap = useMemo(() => {
-    return problems.reduce((acc, problem) => {
+    return contest.problems.reduce((acc, problem) => {
       acc[problem.id] = problem;
       return acc;
     }, {} as Record<string, Problem>);
-  }, [problems]);
+  }, [contest]);
+
+  const teamMap = useMemo(() => {
+    return contest.teams.reduce((acc, team) => {
+      acc[team.id] = team;
+      return acc;
+    }, {} as Record<string, Team>);
+  }, [contest]);
 
   return <>
     <h2>{title} ({balloons.length})</h2>
@@ -48,6 +56,7 @@ const BalloonList = ({ title, balloons, problems, actions }: {
             key={balloon.runId}
             balloon={balloon}
             problem={problemsMap[balloon.problemId]}
+            team={teamMap[balloon.teamId]}
             actions={actions}
           />
         );

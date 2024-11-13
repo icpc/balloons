@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import problemsReducer from './problemsSlice';
+import contestReducer from './contestSlice';
 import balloonsReducer from './balloonsSlice';
+import hallsReducer from './hallsSlice';
 
 export const store = configureStore({
   reducer: {
-    problems: problemsReducer,
+    contest: contestReducer,
     balloons: balloonsReducer,
+    halls: hallsReducer,
   },
 });
 

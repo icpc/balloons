@@ -7,7 +7,7 @@ import kotlin.time.Duration
 data class Balloon(
     val runId: String,
     val isFTS: Boolean,
-    val team: Team,
+    val teamId: String,
     val problemId: String,
     val time: Duration,
     val takenBy: String? = null,

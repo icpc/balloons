@@ -16,7 +16,7 @@ class BalloonRepository(private val jooq: DSLContext) {
             .leftJoin(VOLUNTEER).on(BALLOON.VOLUNTEER_ID.eq(VOLUNTEER.ID))
             .where(
                 BALLOON.PROBLEM_ID.eq(balloon.problemId),
-                BALLOON.TEAM_ID.eq(balloon.team.id),
+                BALLOON.TEAM_ID.eq(balloon.teamId),
             )
             .fetchOne()
 
@@ -31,13 +31,13 @@ class BalloonRepository(private val jooq: DSLContext) {
             .using(jooq.selectOne())
             .on(
                 BALLOON.PROBLEM_ID.eq(balloon.problemId),
-                BALLOON.TEAM_ID.eq(balloon.team.id),
+                BALLOON.TEAM_ID.eq(balloon.teamId),
             )
             .whenMatchedAnd(BALLOON.VOLUNTEER_ID.isNull.or(BALLOON.VOLUNTEER_ID.eq(volunteerId)))
             .thenUpdate().set(BALLOON.VOLUNTEER_ID, volunteerId)
             .whenNotMatchedThenInsert()
             .set(BALLOON.PROBLEM_ID, balloon.problemId)
-            .set(BALLOON.TEAM_ID, balloon.team.id)
+            .set(BALLOON.TEAM_ID, balloon.teamId)
             .set(BALLOON.VOLUNTEER_ID, volunteerId)
             .execute() > 0
 
@@ -52,7 +52,7 @@ class BalloonRepository(private val jooq: DSLContext) {
             .setNull(BALLOON.VOLUNTEER_ID)
             .where(
                 BALLOON.PROBLEM_ID.eq(balloon.problemId),
-                BALLOON.TEAM_ID.eq(balloon.team.id),
+                BALLOON.TEAM_ID.eq(balloon.teamId),
                 BALLOON.VOLUNTEER_ID.eq(volunteerId),
                 BALLOON.DELIVERED.eq(false),
             )
@@ -69,7 +69,7 @@ class BalloonRepository(private val jooq: DSLContext) {
             .set(BALLOON.DELIVERED, true)
             .where(
                 BALLOON.PROBLEM_ID.eq(balloon.problemId),
-                BALLOON.TEAM_ID.eq(balloon.team.id),
+                BALLOON.TEAM_ID.eq(balloon.teamId),
                 BALLOON.VOLUNTEER_ID.eq(volunteerId),
             )
             .execute() > 0

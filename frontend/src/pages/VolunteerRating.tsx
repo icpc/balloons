@@ -14,18 +14,15 @@ const RatingView = () => {
   const balloons = useSelector((state: RootState) => state.balloons.items);
   
   const volunteerStats = useMemo(() => {
-    // Get only delivered balloons with takenBy not null
     const deliveredBalloons = balloons.filter(b => b.delivered && b.takenBy);
-    
-    // Group by volunteer and count
+
     const stats = new Map<string, number>();
     deliveredBalloons.forEach(balloon => {
       if (balloon.takenBy) {
         stats.set(balloon.takenBy, (stats.get(balloon.takenBy) || 0) + 1);
       }
     });
-    
-    // Convert to array and sort
+
     return Array.from(stats.entries())
       .map(([login, count]): VolunteerStats => ({ login, count }))
       .sort((a, b) => b.count - a.count);

@@ -12,9 +12,9 @@ data class Team(
 ) {
     constructor(teamInfo: TeamInfo) : this(
         id = teamInfo.id.value,
-        displayName = teamInfo.displayName,
+        displayName = teamInfo.customFields["place"] ?: teamInfo.id.value,
         fullName = teamInfo.fullName,
-        hall = teamInfo.groups.map { it.value }.find { it.startsWith(HALL_GROUP) }?.removePrefix(HALL_GROUP),
+        hall = teamInfo.customFields["hall"]
     )
 
     companion object {
