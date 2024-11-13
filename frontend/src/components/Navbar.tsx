@@ -2,36 +2,33 @@ import { Link, useLocation } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { HTMLProps } from 'react';
 
-const Navbar = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) => {
   const location = useLocation();
 
   function getLinkClass(path: string): HTMLProps<HTMLAnchorElement> {
     return location.pathname === path ? {className: 'active', 'aria-current': 'page'} : {};
   };
 
+  return <Link {...getLinkClass(to)} to={to}>{children}</Link>
+}
+
+const Navbar = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       {!infoHolder.info.login ? (
         <>
-          <Link {...getLinkClass('/login')} to="/login">
-            Вход
-          </Link>
-          <Link {...getLinkClass('/register')} to="/register">
-            Регистрация
-          </Link>
+          <NavLink to="/login">Вход</NavLink>
+          <NavLink to="/register">Регистрация</NavLink>
         </>
       ) : (
         <>
-          {infoHolder.info.canAccess && (
-            <Link {...getLinkClass('/balloons')} to="/balloons">
-              Очередь
-            </Link>
-          )}
-          {infoHolder.info.canManage && (
-            <Link {...getLinkClass('/volunteers')} to="/volunteers">
-              Волонтеры
-            </Link>
-          )}
+          {infoHolder.info.canAccess && <>
+            <NavLink to="/queue">Очередь</NavLink>
+            <NavLink to="/delivered">Доставлено</NavLink>
+            <NavLink to="/standings">Таблица</NavLink>
+            <NavLink to="/rating">Волонтёры</NavLink>
+          </>}
+          {infoHolder.info.canManage && <NavLink to="/access">Доступ</NavLink>}
         </>
       )}
     </nav>

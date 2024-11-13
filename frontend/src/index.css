@@ -49,7 +49,7 @@ a:hover {
 }
 
 main {
-  margin-top: 1em;
+  margin: 1em 0;
 }
 
 input[type=text],
@@ -91,12 +91,12 @@ footer {
 
 table {
   border-spacing: 0;
-  table-layout: fixed;
-  width: 100%;
+  border-collapse: collapse;
 }
 
 th, td {
-  padding: 0.2em;
+  padding: 0.3em;
+  padding-right: 3em;
 }
 
 th {
@@ -207,4 +207,36 @@ th {
   font-size: 0.75em;
   min-width: 250px;
   max-width: 30vw;
+}
+
+.standings th,
+.standings td {
+  padding: 0.1em;
+}
+
+.standings .team-name,
+.standings .team-place {
+  padding: 0.1em 0.8em;
+}
+
+.standings th:not(.team-name) {
+  text-align: center;
+}
+
+.standings td {
+  padding: 0.1em;
+}
+
+.standings td.team-place {
+  font-size: 1.6em;
+}
+
+.standings td.team-name {
+  font-size: 0.75em;
+  min-width: 250px;
+  max-width: 30vw;
+}
+
+.standings td.team-problem {
+  width: 1.4em;
 }

@@ -4,7 +4,7 @@ import { InfoHolder, Volunteer } from '../types';
 import backendUrls from '../util/backendUrls';
 import { GlobalError } from '../components/GlobalError';
 
-const VolunteersView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ const VolunteersView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           <a onClick={() => setError(null)}> Закрыть</a>
         </div>
       )}
-      <table>
+      <table className="volunteer-access">
         <thead>
           <tr>
             <th rowSpan={2} style={{ verticalAlign: 'bottom' }}>Логин</th>
@@ -152,16 +152,16 @@ const VolunteersView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   );
 };
 
-const Volunteers = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+const VolunteerAccess = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
-  if (!infoHolder.info.canAccess) {
+  if (!infoHolder.info.canManage) {
     return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
   }
 
-  return <VolunteersView infoHolder={infoHolder} />;
+  return <VolunteerAccessView infoHolder={infoHolder} />;
 };
 
-export default Volunteers; 
+export default VolunteerAccess; 

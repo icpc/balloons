@@ -1,60 +1,17 @@
 import { Navigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { GlobalError } from '../components/GlobalError';
-import { useEffect, useMemo, useState } from 'react';
-import { State, WebSocketMessage, Problem, Balloon } from '../types';
-import backendUrls from '../util/backendUrls';
+import { useMemo } from 'react';
 import ProblemList from '../components/ProblemList';
 import BalloonList from '../components/BalloonList';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { useWebSocket } from '../contexts/WebSocketContext';
 
 const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
-  const [problems, setProblems] = useState<Problem[]>([]);
-  const [balloons, setBalloons] = useState<Balloon[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-
-  useEffect(() => {
-    const websocket = new WebSocket(
-      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${backendUrls.eventStream()}`
-    );
-    setWs(websocket);
-
-    websocket.onopen = () => {
-      websocket.send(`${infoHolder.token}`);
-    };
-
-    websocket.onmessage = (event) => {
-      const message: WebSocketMessage = JSON.parse(event.data);
-      
-      if ('type' in message) {
-        switch (message.type) {
-          case 'problemsUpdated':
-            setProblems(message.problems);
-            break;
-          case 'balloonUpdated':
-            setBalloons(prev => {
-              const index = prev.findIndex(b => b.runId === message.balloon.runId);
-              if (index >= 0) {
-                return [...prev.slice(0, index), message.balloon, ...prev.slice(index + 1)];
-              }
-              return [...prev, message.balloon];
-            });
-            break;
-          case 'balloonDeleted':
-            setBalloons(prev => prev.filter(b => b.runId !== message.runId));
-            break;
-        }
-      } else {
-        // Handle State
-        const state = message as State;
-        setProblems(state.problems);
-        setBalloons(state.balloons);
-      }
-    };
-
-    return () => {
-      websocket.close();
-    };
-  }, []);
+  const ws = useWebSocket();
+  const problems = useSelector((state: RootState) => state.problems.items);
+  const balloons = useSelector((state: RootState) => state.balloons.items);
 
   const myBalloons = useMemo(() => {
     return balloons.filter(balloon => balloon.takenBy === infoHolder.info.login && !balloon.delivered);
@@ -64,9 +21,6 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   }, [balloons]);
   const takenBalloons = useMemo(() => {
     return balloons.filter(balloon => balloon.takenBy !== null && !balloon.delivered);
-  }, [balloons]);
-  const deliveredBalloons = useMemo(() => {
-    return balloons.filter(balloon => balloon.delivered);
   }, [balloons]);
 
   return (
@@ -83,13 +37,11 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         actions={(balloon) => <a onClick={() => ws?.send(JSON.stringify({ type: "takeBalloon", runId: balloon.runId }))}>Взять</a>} />
       <BalloonList title="В пути" balloons={takenBalloons} problems={problems}
         actions={(balloon) => <span>Несёт {balloon.takenBy}</span>} />
-      <BalloonList title="Доставлены" balloons={deliveredBalloons} problems={problems}
-        actions={(balloon) => balloon.takenBy !== null ? <span>Доставлен {balloon.takenBy}</span> : <></>} />
     </main>
   );
 };
 
-const Balloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+const ActiveBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
@@ -101,4 +53,4 @@ const Balloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   return <BalloonsView infoHolder={infoHolder} />
 };
 
-export default Balloons;
+export default ActiveBalloons;

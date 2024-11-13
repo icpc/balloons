@@ -1,19 +1,30 @@
 import { useEffect, useState, useCallback } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Info, InfoHolder } from './types'
+import { Info, InfoHolder, State, WebSocketMessage } from './types'
 import backendUrls from './util/backendUrls'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Main from './pages/Main'
-import Volunteers from './pages/Volunteers'
-import Balloons from './pages/Balloons'
+import VolunteerAccess from './pages/VolunteerAccess'
+import ActiveBalloons from './pages/ActiveBalloons'
 import { GlobalError } from './components/GlobalError'
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import { useDispatch } from 'react-redux';
+import { setProblems } from './store/problemsSlice';
+import { updateBalloon, deleteBalloon, setBalloons } from './store/balloonsSlice';
+import { WebSocketContext } from './contexts/WebSocketContext';
+import DeliveredBalloons from './pages/DeliveredBalloons'
+import VolunteerRating from './pages/VolunteerRating'
+import Standings from './pages/Standings'
 
-function App() {
+function AppContent() {
+  const dispatch = useDispatch();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [info, setInfo] = useState<Info>({ contestName: 'Unknown', status: 'loading' });
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
@@ -43,7 +54,52 @@ function App() {
     void fetchInfo();
   }, [fetchInfo]);
 
-  const infoHolder: InfoHolder = { token, setToken: setTokenWithStorage, info, fetchInfo };
+  useEffect(() => {
+    if (!token) {
+      if (ws) {
+        ws.close();
+        setWs(null);
+      }
+      return;
+    }
+
+    const websocket = new WebSocket(
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${backendUrls.eventStream()}`
+    );
+    setWs(websocket);
+
+    websocket.onopen = () => {
+      websocket.send(token);
+    };
+
+    websocket.onmessage = (event) => {
+      const message: WebSocketMessage = JSON.parse(event.data);
+      
+      if ('type' in message) {
+        switch (message.type) {
+          case 'problemsUpdated':
+            dispatch(setProblems(message.problems));
+            break;
+          case 'balloonUpdated':
+            dispatch(updateBalloon(message.balloon));
+            break;
+          case 'balloonDeleted':
+            dispatch(deleteBalloon(message.runId));
+            break;
+        }
+      } else {
+        // Handle initial State
+        const state = message as State;
+        dispatch(setProblems(state.problems));
+        dispatch(setBalloons(state.balloons));
+      }
+    };
+
+    return () => {
+      websocket.close();
+      setWs(null);
+    };
+  }, [token, dispatch]);
 
   if (info.status === 'loading') {
     return (
@@ -54,22 +110,37 @@ function App() {
     );
   }
 
+  const infoHolder: InfoHolder = { token, setToken: setTokenWithStorage, info, fetchInfo };
+
   return (
-    <BrowserRouter>
+    <WebSocketContext.Provider value={ws}>
       <Navbar infoHolder={infoHolder} />
       <Routes>
         <Route path="/" element={<Main infoHolder={infoHolder} />} />
-        <Route path="/balloons" element={<Balloons infoHolder={infoHolder} />} />
+        <Route path="/queue" element={<ActiveBalloons infoHolder={infoHolder} />} />
+        <Route path="/delivered" element={<DeliveredBalloons infoHolder={infoHolder} />} />
+        <Route path="/standings" element={<Standings infoHolder={infoHolder} />} />
+        <Route path="/rating" element={<VolunteerRating infoHolder={infoHolder} />} />
+        <Route path="/access" element={<VolunteerAccess infoHolder={infoHolder} />} />
         <Route path="/login" element={<Login infoHolder={infoHolder} />} />
         <Route path="/register" element={<Register infoHolder={infoHolder} />} />
-        <Route path="/volunteers" element={<Volunteers infoHolder={infoHolder} />} />
         <Route path="*" element={
           <GlobalError title="Not Found" message="The page you&apos;re looking for does not exist." />
         } />
       </Routes>
       <Footer infoHolder={infoHolder} />
-    </BrowserRouter>
-  )
+    </WebSocketContext.Provider>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <BrowserRouter>
+      <Provider store={store}>
+        <AppContent />
+      </Provider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
