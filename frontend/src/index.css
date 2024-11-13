@@ -40,6 +40,7 @@ nav>a.active {
 }
 
 a {
+  user-select: none;
   color: #646cff;
   text-decoration: inherit;
   cursor: pointer;
