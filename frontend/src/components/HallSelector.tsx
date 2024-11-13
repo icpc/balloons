@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { setSelectedHall } from '../store/hallsSlice';
@@ -17,6 +17,12 @@ const HallSelector = () => {
     const hallSet = new Set(contest.teams.map(team => team.hall).filter(Boolean));
     return Array.from(hallSet).sort();
   }, [contest.teams]);
+
+  useEffect(() => {
+    if (selectedHall && !halls.includes(selectedHall)) {
+      dispatch(setSelectedHall(null));
+    }
+  }, [halls, selectedHall, dispatch]);
 
   if (halls.length === 0) return null;
 
