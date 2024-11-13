@@ -2,14 +2,18 @@ package org.icpclive.balloons.db
 
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.module
-import java.sql.Connection
 
-fun databaseModule(config: DatabaseConfig) =
-    module {
-        single { config.createConnection() }
-        single { DSL.using(get<Connection>(), SQLDialect.H2) }
-        singleOf(::BalloonRepository)
-        singleOf(::VolunteerRepository)
-    }
+data class DatabaseModule(
+    val balloonRepository: BalloonRepository,
+    val secretKeyRepository: SecretKeyRepository,
+    val volunteerRepository: VolunteerRepository,
+)
+
+fun databaseModule(databaseConfig: DatabaseConfig): DatabaseModule {
+    val dbConnection = databaseConfig.createConnection()
+    val jooq = DSL.using(dbConnection, SQLDialect.H2)
+    val balloonRepository = BalloonRepository(jooq)
+    val secretKeyRepository = SecretKeyRepository(jooq)
+    val volunteerRepository = VolunteerRepository(jooq)
+    return DatabaseModule(balloonRepository, secretKeyRepository, volunteerRepository)
+}

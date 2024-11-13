@@ -17,7 +17,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("org.icpclive.balloons.CliKt")
+    mainClass.set("org.icpclive.balloons.ApplicationKt")
 }
 
 repositories {
@@ -30,11 +30,11 @@ repositories {
 dependencies {
     jooqGenerator(libs.h2)
 
-    implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)
     implementation(libs.logback)
     implementation(libs.live.cds)
-    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.h2)
     implementation(libs.jooq.kotlin)
     implementation(libs.bcrypt)

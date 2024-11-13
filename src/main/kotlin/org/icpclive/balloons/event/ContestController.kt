@@ -1,6 +1,5 @@
 package org.icpclive.balloons.event
 
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
@@ -15,11 +14,9 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.icpclive.balloons.BalloonConfig
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.auth.WebSocketAuthenticator
 import org.icpclive.cds.util.getLogger
-import org.koin.ktor.ext.inject
 
 @Serializable
 data class UserInfo(
@@ -29,16 +26,17 @@ data class UserInfo(
     val canManage: Boolean? = null,
 )
 
-fun Route.contestController(balloonConfig: BalloonConfig) {
-    val eventStream: EventStream by inject()
-    val webSocketAuthenticator: WebSocketAuthenticator by inject()
-
+fun Route.contestController(
+    eventStream: EventStream,
+    webSocketAuthenticator: WebSocketAuthenticator,
+    disableRegistration: Boolean,
+) {
     authenticate(optional = true) {
         get("/api/info") {
             val principal = call.principal<VolunteerPrincipal>()
 
             if (principal == null) {
-                call.respond(UserInfo(canRegister = balloonConfig.allowPublicRegistration))
+                call.respond(UserInfo(canRegister = !disableRegistration))
             } else {
                 val volunteer = principal.volunteer
                 call.respond(

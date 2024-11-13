@@ -9,7 +9,6 @@ import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.response.respond
 import org.icpclive.balloons.db.VolunteerRepository
-import org.koin.ktor.ext.inject
 
 class CredentialValidator(private val volunteerRepository: VolunteerRepository) {
     fun validate(credential: JWTCredential): VolunteerPrincipal? =
@@ -21,10 +20,10 @@ class CredentialValidator(private val volunteerRepository: VolunteerRepository) 
         }
 }
 
-fun Application.installJwt() {
-    val jwtVerifier: JWTVerifier by inject()
-    val credentialValidator: CredentialValidator by inject()
-
+fun Application.installJwt(
+    jwtVerifier: JWTVerifier,
+    credentialValidator: CredentialValidator,
+) {
     install(Authentication) {
         jwt {
             realm = "balloons"

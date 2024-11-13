@@ -14,7 +14,7 @@ data class Team(
         id = teamInfo.id.value,
         displayName = teamInfo.customFields["place"] ?: teamInfo.id.value,
         fullName = teamInfo.fullName,
-        hall = teamInfo.customFields["hall"]
+        hall = teamInfo.customFields["hall"],
     )
 
     companion object {

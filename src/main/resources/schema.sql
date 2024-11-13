@@ -14,3 +14,7 @@ create table if not exists balloon (
     delivered boolean not null default false,
     unique (problem_id, team_id)
 );
+
+create table if not exists secret_key (
+    data binary(32) not null
+);

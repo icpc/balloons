@@ -13,7 +13,7 @@ import io.ktor.websocket.readText
  */
 class WebSocketAuthenticator(
     private val jwtVerifier: JWTVerifier,
-    private val credentialValidator: CredentialValidator
+    private val credentialValidator: CredentialValidator,
 ) {
     suspend fun authenticate(session: WebSocketSession): VolunteerPrincipal? {
         while (true) {
@@ -22,11 +22,12 @@ class WebSocketAuthenticator(
                 continue
             }
 
-            val decoded = try {
-                jwtVerifier.verify(frame.readText())
-            } catch (exc: JWTVerificationException) {
-                return null
-            }
+            val decoded =
+                try {
+                    jwtVerifier.verify(frame.readText())
+                } catch (exc: JWTVerificationException) {
+                    return null
+                }
 
             val principal = credentialValidator.validate(JWTCredential(decoded))
 

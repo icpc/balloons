@@ -6,60 +6,56 @@
 
 ## Setup
 
-1. Use the same configs as in [ICPC Live Overlay v3](https://github.com/icpc/live-v3)
-2. Add `balloons.json` with
-
-   ```json
-   {
-     "secretKey": "",                 // (required)
-     "allowPublicRegistration": true, // (default: true)
-     "port": 8000                     // (default: 8001)
-   }
-   ```
-
-   If public registration is allowed (**default**), users can create themselves but you still need to approve them.
-   Otherwise, you need to register everyone in admin interface or via CLI.
+Use the same configs as in [ICPC Live Overlay v3](https://github.com/icpc/live-v3). That's all!
 
 ## Launch
 
 ```bash
-java -jar balloons.jar run -c path/to/config
+java -jar balloons.jar -c path/to/config
 ```
 
 You can customize a few options:
-* We create H2 database that contains a few files. You can control its location by `--database-file=/path/to/h2`, by default it is created
-  in current working directory with prefix `h2`. [Read more](http://www.h2database.com/html/features.html#database_file_layout) about database files.
 
 * All customization supported by [Overlay](https://github.com/icpc/live-v3) are supported!
-  You likely want to [set problem colors](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md#change-problem-info).
+  You likely want to [set problem colors](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md#change-problem-info) and
+  add custom fields — it's `custom-fields.csv` file in config directory that contain columns `team_id,hall,place`.
 
-> [!IMPORTANT] 
-> When specifying flags, make sure that `-d` / `--database-file` is set **before** command (`run` / `volunteer`) and all other options
-> are set **after** command.
+* By default, port is 8001, but you can set another one via `--port=1234`.
+
+* By default, registration is enabled (but you still need to approve everyone), you can block self-registration using `--disable-registration`.
 
 Then navigate in your browser to `http://{ip}:{port}/` (by default and from the same machine, http://localhost:8001/). If this service
 is exposed to the internet, it's strictly recommended to use some reverse proxy like nginx.
 
 Don't forget to add admin user (see below).
 
+> We create H2 database that contains a few files. They are created in config directory and start with `h2`, e.g. `h2.trace.db`.
+> [Read more](http://www.h2database.com/html/features.html#database_file_layout) about database files.
+>  
+> You may want to `.gitignore` them if you're committing configs to some repository.
+
 ## CLI
 
 ```bash
 # Create a volunteer
-java -jar balloons.jar volunteer create login password
+java -jar balloons.jar -c config volunteer create login password
 
 # Create an admin
-java -jar balloons.jar volunteer create --admin login password
+java -jar balloons.jar -c config volunteer create --admin login password
 
 # Make the volunteer an admin
-java -jar balloons.jar volunteer update login --make-admin
+java -jar balloons.jar -c config volunteer update login --make-admin
 
 # Change password
-java -jar balloons.jar volunteer update login --new-password=password
+java -jar balloons.jar -c config volunteer update login --new-password=password
 
 # Database SQL shell
-java -jar balloons.jar h2shell
+java -jar balloons.jar -c config h2shell
 ```
+
+> [!IMPORTANT]
+> When specifying flags, make sure that `-c` / `--config-directory` is set **before** command (`h2shell` / `volunteer`) and other options
+> (username, password) are set **after** command.
 
 ## Development
 
@@ -88,4 +84,3 @@ gradle shadowJar
 - [ ] Frontend: detect connection errors
 - [ ] Tests
 - [ ] Some docs on how to develop it
-- [ ] Automate JWT secret generation 

@@ -1,7 +1,6 @@
 package org.icpclive.balloons.admin
 
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
@@ -13,7 +12,6 @@ import kotlinx.serialization.Serializable
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.db.VolunteerRepository
 import org.icpclive.cds.util.getLogger
-import org.koin.ktor.ext.inject
 
 @Serializable
 data class VolunteerPatch(
@@ -21,9 +19,7 @@ data class VolunteerPatch(
     val canAccess: Boolean? = null,
 )
 
-fun Route.adminController() {
-    val volunteerRepository: VolunteerRepository by inject()
-
+fun Route.adminController(volunteerRepository: VolunteerRepository) {
     authenticate {
         get("/api/volunteers") {
             val principal: VolunteerPrincipal? = call.principal()
@@ -48,11 +44,12 @@ fun Route.adminController() {
                 call.parameters["id"]?.toLongOrNull()
                     ?: return@patch call.respond(HttpStatusCode.BadRequest)
 
-            val volunteer = volunteerRepository.getById(volunteerId)
-                ?: return@patch call.respond(HttpStatusCode.NotFound)
+            val volunteer =
+                volunteerRepository.getById(volunteerId)
+                    ?: return@patch call.respond(HttpStatusCode.NotFound)
 
             val patch = call.receive<VolunteerPatch>()
-            logger.info { "Manager ${principal.volunteer.login} changes ${volunteer.login} rights to $patch"}
+            logger.info { "Manager ${principal.volunteer.login} changes ${volunteer.login} rights to $patch" }
 
             if (patch.canAccess == null && patch.canManage == null) {
                 call.respond(HttpStatusCode.BadRequest, "At least canAccess or canManage should be set")

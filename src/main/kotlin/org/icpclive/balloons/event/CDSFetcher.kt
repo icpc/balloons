@@ -1,6 +1,5 @@
 package org.icpclive.balloons.event
 
-import io.ktor.server.application.Application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
@@ -9,7 +8,6 @@ import kotlinx.coroutines.launch
 import org.icpclive.cds.InfoUpdate
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.cli.CdsCommandLineOptions
-import org.koin.ktor.ext.inject
 
 class CDSFetcher(
     private val eventStream: EventStream,
@@ -30,9 +28,7 @@ class CDSFetcher(
     }
 }
 
-fun Application.launchCDSFetcher() {
-    val cdsFetcher: CDSFetcher by inject()
-
+fun launchCDSFetcher(cdsFetcher: CDSFetcher) {
     CoroutineScope(Job()).launch {
         cdsFetcher.run()
     }

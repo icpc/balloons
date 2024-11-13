@@ -1,22 +1,16 @@
 [versions]
 jooq = "3.19.1"
 h2 = "2.3.232"
-koin = "4.0.0"
 kotlin = "2.0.21"
-ktor = "2.3.12"
+ktor = "3.0.1"
 logback = "1.5.12"
 
 [libraries]
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
-koin-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
-
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-# ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
@@ -25,10 +19,10 @@ bcrypt = { module = "at.favre.lib:bcrypt", version = "0.10.2" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
-# Don't update further until this is fixed: https://github.com/InsertKoinIO/koin/issues/1716
-live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version = "5bfde01924e424c6aceba97b7abdbce5bbdd0ee1" }
+live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version = "2177452c13f33b944e39e4fbecf2a683661d3ca3" }
 
-kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version = "5.7.1" }
@@ -39,7 +33,6 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 jooq-kotlin = { module = "org.jooq:jooq-kotlin", version.ref = "jooq" }
 
 [bundles]
-koin = ["koin-core", "koin-ktor", "koin-slf4j"]
 ktor = [
     "ktor-server-core", "ktor-server-auth", "ktor-server-auth-jwt", "ktor-server-content-negotiation", "ktor-server-netty",
     "ktor-server-websockets", "ktor-serialization-kotlinx-json"
