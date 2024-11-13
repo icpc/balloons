@@ -103,7 +103,6 @@ th, td {
 th {
   text-align: left;
   border-bottom: 1px solid #000;
-  width: 1fr;
 }
 
 .sr-only {
@@ -238,8 +237,9 @@ th {
   max-width: 30vw;
 }
 
+.standings th.team-problem,
 .standings td.team-problem {
-  width: 2.1em;
+  min-width: 2.1em;
 }
 
 .hall-dropdown {
@@ -269,8 +269,6 @@ th {
   margin-left: 0.3em;
   font-size: 0.8em;
 }
-
-
 
 .hall-dropdown-menu {
   position: absolute;
