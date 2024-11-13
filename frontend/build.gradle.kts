@@ -14,7 +14,6 @@ fun TaskContainerScope.pnpmBuild(name: String, configure: PnpmTask.(Directory) -
     outputs.cacheIf { true }
     environment.set(mapOf("BUILD_PATH" to "build"))
     inputs.dir(layout.projectDirectory.dir("src"))
-    inputs.dir(layout.projectDirectory.dir("public"))
     inputs.file(layout.projectDirectory.file("package.json"))
     inputs.file(layout.projectDirectory.file("pnpm-lock.yaml"))
     inputs.file(layout.projectDirectory.file("tsconfig.json"))
