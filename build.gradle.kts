@@ -13,7 +13,7 @@ group = "org.icpclive.balloons"
 version = "0.0.1"
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 application {

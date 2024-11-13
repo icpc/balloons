@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Java 21
+* Java 17
 
 ## Setup
 
