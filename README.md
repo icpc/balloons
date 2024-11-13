@@ -79,9 +79,21 @@ This task should do the trick.
 gradle shadowJar
 ```
 
+## License
+
+You may use this repository code according to [The MIT License](LICENSE) terms.
+
+## Credits
+
+This project is inspired by previous versions — [neerc/balloons](https://github.com/neerc/balloons) and [nikkirche/balloons-reborn](https://github.com/nikkirche/balloons-reborn).
+
+All of this wouldn't work without [ICPC Live tools](https://github.com/icpc/live-v3).
+
 ## TODO
 
 - [ ] Frontend: implement some pings to detect connectivity issues (??)
-- [ ] Store time of delivery and show it in interface
+- [ ] Store time of run and delivery and show it in interface
+- [ ] Show number of balloons remaining
 - [ ] Tests
 - [ ] Some docs on how to develop it
+- [ ] i18n
