@@ -71,9 +71,7 @@ gradle shadowJar
 
 ## TODO
 
-- [ ] Frontend: fix space between links
-- [ ] Build under newer Javas
-- [ ] CI
+- [ ] Frontend: detect connection errors
 - [ ] Tests
 - [ ] Some docs on how to develop it
 - [ ] Automate JWT secret generation 
