@@ -81,6 +81,7 @@ gradle shadowJar
 
 ## TODO
 
-- [ ] Frontend: detect connection errors
+- [ ] Frontend: implement some pings to detect connectivity issues (??)
+- [ ] Store time of delivery and show it in interface
 - [ ] Tests
 - [ ] Some docs on how to develop it

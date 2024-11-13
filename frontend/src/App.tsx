@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Info, InfoHolder, State, WebSocketMessage } from './types'
 import backendUrls from './util/backendUrls'
@@ -18,12 +18,16 @@ import { WebSocketContext } from './contexts/WebSocketContext';
 import DeliveredBalloons from './pages/DeliveredBalloons'
 import VolunteerRating from './pages/VolunteerRating'
 import Standings from './pages/Standings'
+import ConnectionStatus from './components/ConnectionStatus'
+
+const RECONNECT_DELAY = 3000; // 3 seconds
 
 function AppContent() {
   const dispatch = useDispatch();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [info, setInfo] = useState<Info>({ status: 'loading' });
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<number>();
 
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
@@ -53,22 +57,30 @@ function AppContent() {
     void fetchInfo();
   }, [fetchInfo]);
 
-  useEffect(() => {
-    if (!token) {
-      if (ws) {
-        ws.close();
-        setWs(null);
-      }
-      return;
-    }
-
+  const createWebSocket = useCallback(() => {
     const websocket = new WebSocket(
       `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${backendUrls.eventStream()}`
     );
-    setWs(websocket);
 
     websocket.onopen = () => {
-      websocket.send(token);
+      websocket.send(token!);
+      // Clear any pending reconnection attempts
+      if (reconnectTimeoutRef.current) {
+        window.clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = undefined;
+      }
+    };
+
+    websocket.onclose = () => {
+      // Schedule reconnection
+      if (!reconnectTimeoutRef.current) {
+        reconnectTimeoutRef.current = window.setTimeout(() => {
+          reconnectTimeoutRef.current = undefined;
+          if (token && info.canAccess) {
+            setWs(createWebSocket());
+          }
+        }, RECONNECT_DELAY);
+      }
     };
 
     websocket.onmessage = (event) => {
@@ -94,11 +106,29 @@ function AppContent() {
       }
     };
 
+    return websocket;
+  }, [token, dispatch, info.canAccess]);
+
+  useEffect(() => {
+    if (!token || !info.canAccess) {
+      if (ws) {
+        ws.close();
+        setWs(null);
+      }
+      return;
+    }
+
+    const websocket = createWebSocket();
+    setWs(websocket);
+
     return () => {
       websocket.close();
+      if (reconnectTimeoutRef.current) {
+        window.clearTimeout(reconnectTimeoutRef.current);
+      }
       setWs(null);
     };
-  }, [token, dispatch]);
+  }, [token, info.canAccess, createWebSocket]);
 
   if (info.status === 'loading') {
     return (
@@ -113,6 +143,7 @@ function AppContent() {
 
   return (
     <WebSocketContext.Provider value={ws}>
+      <ConnectionStatus />
       <Navbar infoHolder={infoHolder} />
       <Routes>
         <Route path="/" element={<ActiveBalloons infoHolder={infoHolder} />} />
