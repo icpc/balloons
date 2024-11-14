@@ -21,8 +21,17 @@ const BalloonsView = () => {
       <h2 className="sr-only">Доставленные шарики</h2>
       <div className="contest-name"><strong>{contest.name}</strong></div>
       <ProblemList contest={contest} balloons={filteredBalloons} />
-      <BalloonList title="Доставлены" balloons={deliveredBalloons} contest={contest}
-        actions={(balloon) => <span>Доставлен {balloon.takenBy ?? ''}</span>} />
+      <BalloonList
+        title="Доставлены"
+        balloons={deliveredBalloons}
+        contest={contest}
+        actions={balloon => (
+          <span>
+            Доставлен
+            {balloon.takenBy ?? ''}
+          </span>
+        )}
+      />
     </main>
   );
 };
@@ -36,7 +45,7 @@ const DeliveredBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
     return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
   }
 
-  return <BalloonsView />
+  return <BalloonsView />;
 };
 
 export default DeliveredBalloons;

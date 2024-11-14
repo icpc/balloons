@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Balloon } from '../types';
 
 interface BalloonsState {
-  items: Balloon[];
+  items: Balloon[]
 }
 
 const initialState: BalloonsState = {
@@ -17,7 +17,8 @@ export const balloonsSlice = createSlice({
       const index = state.items.findIndex(b => b.runId === action.payload.runId);
       if (index >= 0) {
         state.items[index] = action.payload;
-      } else {
+      }
+      else {
         state.items.push(action.payload);
       }
     },
@@ -31,4 +32,4 @@ export const balloonsSlice = createSlice({
 });
 
 export const { updateBalloon, deleteBalloon, setBalloons } = balloonsSlice.actions;
-export default balloonsSlice.reducer; 
+export default balloonsSlice.reducer;

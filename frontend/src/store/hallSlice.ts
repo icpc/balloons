@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface HallState {
-  selectedHall: string | null;
+  selectedHall: string | null
 }
 
 const initialState: HallState = {
-  selectedHall: localStorage.getItem('selectedHall')
+  selectedHall: localStorage.getItem('selectedHall'),
 };
 
 export const hallSlice = createSlice({
@@ -16,7 +16,8 @@ export const hallSlice = createSlice({
       state.selectedHall = action.payload;
       if (action.payload) {
         localStorage.setItem('selectedHall', action.payload);
-      } else {
+      }
+      else {
         localStorage.removeItem('selectedHall');
       }
     },
@@ -24,4 +25,4 @@ export const hallSlice = createSlice({
 });
 
 export const { setSelectedHall } = hallSlice.actions;
-export default hallSlice.reducer; 
+export default hallSlice.reducer;

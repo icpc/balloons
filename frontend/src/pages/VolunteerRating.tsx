@@ -6,18 +6,18 @@ import { InfoHolder } from '../types';
 import { GlobalError } from '../components/GlobalError';
 
 interface VolunteerStats {
-  login: string;
-  count: number;
+  login: string
+  count: number
 }
 
 const RatingView = () => {
   const balloons = useSelector((state: RootState) => state.balloons.items);
-  
+
   const volunteerStats = useMemo(() => {
     const deliveredBalloons = balloons.filter(b => b.delivered && b.takenBy);
 
     const stats = new Map<string, number>();
-    deliveredBalloons.forEach(balloon => {
+    deliveredBalloons.forEach((balloon) => {
       if (balloon.takenBy) {
         stats.set(balloon.takenBy, (stats.get(balloon.takenBy) ?? 0) + 1);
       }

@@ -1,24 +1,24 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Info, InfoHolder, WebSocketMessage } from './types'
-import backendUrls from './util/backendUrls'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import VolunteerAccess from './pages/VolunteerAccess'
-import ActiveBalloons from './pages/ActiveBalloons'
-import { GlobalError } from './components/GlobalError'
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Info, InfoHolder, WebSocketMessage } from './types';
+import backendUrls from './util/backendUrls';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import VolunteerAccess from './pages/VolunteerAccess';
+import ActiveBalloons from './pages/ActiveBalloons';
+import { GlobalError } from './components/GlobalError';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { useDispatch } from 'react-redux';
 import { setContest } from './store/contestSlice';
 import { updateBalloon, deleteBalloon, setBalloons } from './store/balloonsSlice';
 import { WebSocketContext } from './contexts/WebSocketContext';
-import DeliveredBalloons from './pages/DeliveredBalloons'
-import VolunteerRating from './pages/VolunteerRating'
-import Standings from './pages/Standings'
-import ConnectionStatus from './components/ConnectionStatus'
+import DeliveredBalloons from './pages/DeliveredBalloons';
+import VolunteerRating from './pages/VolunteerRating';
+import Standings from './pages/Standings';
+import ConnectionStatus from './components/ConnectionStatus';
 
 const RECONNECT_DELAY = 3000; // 3 seconds
 
@@ -32,7 +32,8 @@ function AppContent() {
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
-    } else {
+    }
+    else {
       localStorage.removeItem('token');
     }
     setToken(newToken);
@@ -41,15 +42,18 @@ function AppContent() {
   const fetchInfo = useCallback(async () => {
     try {
       const response = await fetch(backendUrls.getInfo(), {
-        headers: token ? {
-          Authorization: `Bearer ${token}`
-        } : undefined
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : undefined,
       });
       const data = await response.json() as Info;
-      setInfo({ ...data, status: 'success' })
-    } catch (exc) {
-      console.error('Error fetching info:', exc)
-      setInfo(prevInfo => ({ ...prevInfo, status: 'error' }))
+      setInfo({ ...data, status: 'success' });
+    }
+    catch (exc) {
+      console.error('Error fetching info:', exc);
+      setInfo(prevInfo => ({ ...prevInfo, status: 'error' }));
     }
   }, [token]);
 
@@ -59,7 +63,7 @@ function AppContent() {
 
   const createWebSocket = useCallback(() => {
     const websocket = new WebSocket(
-      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${backendUrls.eventStream()}`
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${backendUrls.eventStream()}`,
     );
 
     websocket.onopen = () => {
@@ -85,7 +89,7 @@ function AppContent() {
 
     websocket.onmessage = (event: MessageEvent<string>) => {
       const message = JSON.parse(event.data) as WebSocketMessage;
-      
+
       if ('type' in message) {
         switch (message.type) {
           case 'contestUpdated':
@@ -98,7 +102,8 @@ function AppContent() {
             dispatch(deleteBalloon(message.runId));
             break;
         }
-      } else {
+      }
+      else {
         // Handle initial State
         const state = message;
         dispatch(setContest(state.contest));
@@ -152,9 +157,12 @@ function AppContent() {
         <Route path="/access" element={<VolunteerAccess infoHolder={infoHolder} />} />
         <Route path="/login" element={<Login infoHolder={infoHolder} />} />
         <Route path="/register" element={<Register infoHolder={infoHolder} />} />
-        <Route path="*" element={
-          <GlobalError title="404" message="Такой страницы не существует." />
-        } />
+        <Route
+          path="*"
+          element={
+            <GlobalError title="404" message="Такой страницы не существует." />
+          }
+        />
       </Routes>
       <Footer infoHolder={infoHolder} />
     </WebSocketContext.Provider>

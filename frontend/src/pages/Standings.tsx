@@ -8,8 +8,8 @@ import ProblemBox from '../components/ProblemBox';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 
 interface TeamStats {
-  team: Team;
-  solvedProblems: Set<string>;
+  team: Team
+  solvedProblems: Set<string>
 }
 
 const StandingsView = () => {
@@ -20,7 +20,7 @@ const StandingsView = () => {
   const teamStats: TeamStats[] = useMemo(() => {
     const statsMap = new Map<string, Set<string>>();
 
-    filteredBalloons.forEach(balloon => {
+    filteredBalloons.forEach((balloon) => {
       if (!statsMap.has(balloon.teamId)) {
         statsMap.set(balloon.teamId, new Set());
       }
@@ -29,10 +29,10 @@ const StandingsView = () => {
 
     return contest.teams
       .filter(team => !selectedHall || team.hall === selectedHall)
-      .map(team => {
+      .map((team) => {
         return {
           team,
-          solvedProblems: statsMap.get(team.id) ?? new Set()
+          solvedProblems: statsMap.get(team.id) ?? new Set(),
         };
       });
   }, [filteredBalloons, contest, selectedHall]);
@@ -56,9 +56,11 @@ const StandingsView = () => {
               <td className="team-place">{team.displayName}</td>
               {contest.problems.map(problem => (
                 <td className="team-problem" key={problem.id}>
-                  {solvedProblems.has(problem.id) ? (
-                    <ProblemBox problem={problem} />
-                  ) : null}
+                  {solvedProblems.has(problem.id)
+                    ? (
+                        <ProblemBox problem={problem} />
+                      )
+                    : null}
                 </td>
               ))}
               <td className="team-name">{team.fullName}</td>

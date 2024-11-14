@@ -1,25 +1,25 @@
 export default {
-    getInfo() {
-        return '/api/info'
-    },
+  getInfo() {
+    return '/api/info';
+  },
 
-    getVolunteers() {
-        return '/api/volunteers'
-    },
+  getVolunteers() {
+    return '/api/volunteers';
+  },
 
-    patchVolunteer(id: number) {
-        return `/api/volunteers/${id}`
-    },
+  patchVolunteer(id: number) {
+    return `/api/volunteers/${id}`;
+  },
 
-    eventStream() {
-        return '/api/balloons'
-    },
+  eventStream() {
+    return '/api/balloons';
+  },
 
-    login() {
-        return '/api/login'
-    },
+  login() {
+    return '/api/login';
+  },
 
-    register() {
-        return '/api/register'
-    }
-}
+  register() {
+    return '/api/register';
+  },
+};

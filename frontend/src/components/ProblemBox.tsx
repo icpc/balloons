@@ -1,5 +1,5 @@
-import { HTMLProps, useMemo } from "react";
-import { Problem } from "../types";
+import { HTMLProps, useMemo } from 'react';
+import { Problem } from '../types';
 
 function isLightColor(color: string): boolean {
   const hex = color.replace('#', '');
@@ -15,18 +15,20 @@ function styleProblem(problem: Problem): HTMLProps<HTMLDivElement> {
     return {
       style: {
         backgroundColor: problem.color,
-        color: isLightColor(problem.color) ? 'black' : 'white'
+        color: isLightColor(problem.color) ? 'black' : 'white',
       },
-      className: 'problem'
+      className: 'problem',
     };
   }
-  return {className: 'crossed problem'};
+  return { className: 'crossed problem' };
 }
 
 const ProblemBox = ({ problem }: { problem: Problem }) => {
-  return useMemo(() => <div {...styleProblem(problem)}>
-    {problem.alias}
-  </div>, [problem]);
+  return useMemo(() => (
+    <div {...styleProblem(problem)}>
+      {problem.alias}
+    </div>
+  ), [problem]);
 };
 
 export default ProblemBox;

@@ -2,7 +2,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useState, useEffect } from 'react';
 import { InfoHolder } from '../types';
 
-const ConnectionStatus = ({ infoHolder } : { infoHolder: InfoHolder}) => {
+const ConnectionStatus = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   const ws = useWebSocket();
   const [connectionState, setConnectionState] = useState<number>();
 
@@ -39,8 +39,8 @@ const ConnectionStatus = ({ infoHolder } : { infoHolder: InfoHolder}) => {
   if (connectionState === WebSocket.CLOSED || connectionState === WebSocket.CLOSING) {
     return <div className="connection-status lost" role="alert">Соединение потеряно. Переподключение...</div>;
   }
-  
+
   return null;
 };
 
-export default ConnectionStatus; 
+export default ConnectionStatus;

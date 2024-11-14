@@ -1,6 +1,6 @@
 interface GlobalErrorProps {
-  title: string;
-  message: string;
+  title: string
+  message: string
 }
 
 export function GlobalError({ title, message }: GlobalErrorProps) {

@@ -33,8 +33,8 @@ const HallSelector = () => {
 
   return (
     <div className="hall-dropdown" ref={dropdownRef}>
-      <span 
-        className="hall-dropdown-toggle" 
+      <span
+        className="hall-dropdown-toggle"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -44,8 +44,8 @@ const HallSelector = () => {
       </span>
       {isOpen && (
         <ul className="hall-dropdown-menu" role="menu">
-          <li 
-            className={!selectedHall ? 'active' : ''} 
+          <li
+            className={!selectedHall ? 'active' : ''}
             onClick={() => handleSelect(null)}
           >
             Все холлы
@@ -56,7 +56,9 @@ const HallSelector = () => {
               className={selectedHall === hall ? 'active' : ''}
               onClick={() => handleSelect(hall)}
             >
-              Холл {hall}
+              Холл
+              {' '}
+              {hall}
             </li>
           ))}
         </ul>
@@ -65,4 +67,4 @@ const HallSelector = () => {
   );
 };
 
-export default HallSelector; 
+export default HallSelector;

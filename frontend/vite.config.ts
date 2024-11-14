@@ -1,7 +1,7 @@
 /// <reference types="node" />
 
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,12 +10,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: process.env.BACKEND_URL ?? 'http://localhost:8001',
-        changeOrigin: true
+        changeOrigin: true,
       },
       '/api/balloons': {
         target: process.env.BACKEND_URL ?? 'ws://localhost:8001',
-        ws: true
-      }
-    }
-  }
-})
+        ws: true,
+      },
+    },
+  },
+});

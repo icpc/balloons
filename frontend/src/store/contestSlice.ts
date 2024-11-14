@@ -20,4 +20,4 @@ export const problemsSlice = createSlice({
 });
 
 export const { setContest } = problemsSlice.actions;
-export default problemsSlice.reducer; 
+export default problemsSlice.reducer;

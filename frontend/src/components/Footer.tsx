@@ -11,10 +11,15 @@ const Footer = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   return (
     <footer>
-      {infoHolder.info?.login && <>
-        <span>Вы вошли как <strong>{infoHolder.info.login}</strong> </span>
-        <a onClick={handleLogout}>Выйти</a>
-      </>}
+      {infoHolder.info?.login && (
+        <>
+          <span>
+            Вы вошли как
+            <strong>{infoHolder.info.login}</strong>
+          </span>
+          <a onClick={handleLogout}>Выйти</a>
+        </>
+      )}
       <span>
         <a href="https://github.com/nsychev/balloons-reborn" target="_blank" rel="noopener noreferrer">Open&nbsp;source</a>
       </span>
@@ -23,4 +28,4 @@ const Footer = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   );
 };
 
-export default Footer; 
+export default Footer;

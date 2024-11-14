@@ -50,10 +50,12 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         infoHolder.setToken(data.token);
         navigate('/');
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err);
       setError('Произошла ошибка при регистрации');
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -61,13 +63,13 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   return (
     <main>
       <h1 className="sr-only">Регистрация</h1>
-      <form onSubmit={(e) => { void handleSubmit(e) }}>
+      <form onSubmit={(e) => { void handleSubmit(e); }}>
         <label htmlFor="login">Логин</label>
         <input
           type="text"
           id="login"
           value={login}
-          onChange={(e) => setLogin(e.target.value)}
+          onChange={e => setLogin(e.target.value)}
           disabled={isLoading}
           required
           autoComplete="username"
@@ -79,7 +81,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           type="password"
           id="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           disabled={isLoading}
           required
           minLength={6}
@@ -89,7 +91,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           type="password"
           id="confirmPassword"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={e => setConfirmPassword(e.target.value)}
           disabled={isLoading}
           required
         />
@@ -109,4 +111,4 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   );
 };
 
-export default Register; 
+export default Register;

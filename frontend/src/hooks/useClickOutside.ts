@@ -17,4 +17,4 @@ export function useClickOutside(ref: RefObject<HTMLElement>, handler: () => void
       document.removeEventListener('touchstart', listener);
     };
   }, [ref, handler]);
-} 
+}

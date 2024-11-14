@@ -38,10 +38,12 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         infoHolder.setToken(data.token);
         navigate('/');
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err);
       setError('Произошла ошибка при входе');
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -49,13 +51,13 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   return (
     <main>
       <h1 className="sr-only">Вход</h1>
-      <form onSubmit={(e) => { void handleSubmit(e) }}>
+      <form onSubmit={(e) => { void handleSubmit(e); }}>
         <label htmlFor="login">Логин</label>
         <input
           type="text"
           id="login"
           value={login}
-          onChange={(e) => setLogin(e.target.value)}
+          onChange={e => setLogin(e.target.value)}
           disabled={isLoading}
           required
           autoComplete="username"
@@ -67,7 +69,7 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           type="password"
           id="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           disabled={isLoading}
           required
         />
@@ -87,4 +89,4 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   );
 };
 
-export default Login; 
+export default Login;

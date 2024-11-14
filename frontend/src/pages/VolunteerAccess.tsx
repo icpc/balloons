@@ -14,8 +14,8 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
     try {
       const response = await fetch(backendUrls.getVolunteers(), {
         headers: {
-          Authorization: `Bearer ${infoHolder.token}`
-        }
+          Authorization: `Bearer ${infoHolder.token}`,
+        },
       });
 
       if (!response.ok) {
@@ -25,10 +25,12 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       const data = await response.json() as Volunteer[];
       setVolunteers(data);
       setError(null);
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err);
       setError('Не удалось загрузить список волонтеров');
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   }, [infoHolder.token]);
@@ -56,12 +58,14 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       }
 
       setVolunteers(volunteers.map(v =>
-        v.id === id ? { ...v, [role]: newValue } : v
+        v.id === id ? { ...v, [role]: newValue } : v,
       ));
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err);
       setError('Не удалось обновить права доступа');
-    } finally {
+    }
+    finally {
       setIsUpdating(null);
     }
   };
@@ -99,53 +103,55 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           </tr>
         </thead>
         <tbody>
-          {volunteers.length === 0 ? (
-            <tr>
-              <td colSpan={3} className="text-center">
-                {error ? 'Не удалось загрузить данные' : 'Нет волонтеров'}
-              </td>
-            </tr>
-          ) : (
-            volunteers.map((volunteer) => {
-              const isSelf = volunteer.login === infoHolder.info?.login;
-              const isUpdatingThis = isUpdating === String(volunteer.id);
-
-              return (
-                <tr key={volunteer.id}>
-                  <td>{volunteer.login}</td>
-                  <td>
-                    <span>
-                      {volunteer.canAccess ? '✔️ ' : '❌ '}
-                    </span>
-                    {!isSelf && (!volunteer.canAccess || !volunteer.canManage) && (
-                      <a
-                        onClick={() => void handleRoleChange(volunteer.id, 'canAccess', !volunteer.canAccess)}
-                        className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
-                      >
-                        {isUpdatingThis ? '...' : (volunteer.canAccess ? 'Отозвать' : 'Выдать')}
-                      </a>
-                    )}
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center gap-2">
-                      <span>
-                        {volunteer.canManage ? '✔️ ' : '❌ '}
-                      </span>
-                      {isSelf && 'Это вы'}
-                      {!isSelf && (
-                        <a
-                          onClick={() => void handleRoleChange(volunteer.id, 'canManage', !volunteer.canManage)}
-                          className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
-                        >
-                          {isUpdatingThis ? '...' : (volunteer.canManage ? 'Отозвать' : 'Выдать')}
-                        </a>
-                      )}
-                    </div>
+          {volunteers.length === 0
+            ? (
+                <tr>
+                  <td colSpan={3} className="text-center">
+                    {error ? 'Не удалось загрузить данные' : 'Нет волонтеров'}
                   </td>
                 </tr>
-              );
-            })
-          )}
+              )
+            : (
+                volunteers.map((volunteer) => {
+                  const isSelf = volunteer.login === infoHolder.info?.login;
+                  const isUpdatingThis = isUpdating === String(volunteer.id);
+
+                  return (
+                    <tr key={volunteer.id}>
+                      <td>{volunteer.login}</td>
+                      <td>
+                        <span>
+                          {volunteer.canAccess ? '✔️ ' : '❌ '}
+                        </span>
+                        {!isSelf && (!volunteer.canAccess || !volunteer.canManage) && (
+                          <a
+                            onClick={() => void handleRoleChange(volunteer.id, 'canAccess', !volunteer.canAccess)}
+                            className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
+                          >
+                            {isUpdatingThis ? '...' : (volunteer.canAccess ? 'Отозвать' : 'Выдать')}
+                          </a>
+                        )}
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <span>
+                            {volunteer.canManage ? '✔️ ' : '❌ '}
+                          </span>
+                          {isSelf && 'Это вы'}
+                          {!isSelf && (
+                            <a
+                              onClick={() => void handleRoleChange(volunteer.id, 'canManage', !volunteer.canManage)}
+                              className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
+                            >
+                              {isUpdatingThis ? '...' : (volunteer.canManage ? 'Отозвать' : 'Выдать')}
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
         </tbody>
       </table>
     </main>
@@ -164,4 +170,4 @@ const VolunteerAccess = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   return <VolunteerAccessView infoHolder={infoHolder} />;
 };
 
-export default VolunteerAccess; 
+export default VolunteerAccess;

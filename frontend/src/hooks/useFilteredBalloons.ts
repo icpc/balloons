@@ -9,9 +9,9 @@ export function useFilteredBalloons() {
 
   return useMemo(() => {
     if (!selectedHall) return balloons;
-    return balloons.filter(balloon => {
+    return balloons.filter((balloon) => {
       const team = contest.teams.find(t => t.id === balloon.teamId);
       return team?.hall === selectedHall;
     });
   }, [balloons, contest.teams, selectedHall]);
-} 
+}

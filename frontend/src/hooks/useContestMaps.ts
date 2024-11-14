@@ -17,4 +17,4 @@ export const useContestMaps = (contest: Contest) => {
   }, [contest.teams]);
 
   return { problemsMap, teamMap };
-}; 
+};
