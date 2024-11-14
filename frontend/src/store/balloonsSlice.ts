@@ -17,8 +17,7 @@ export const balloonsSlice = createSlice({
       const index = state.items.findIndex(b => b.runId === action.payload.runId);
       if (index >= 0) {
         state.items[index] = action.payload;
-      }
-      else {
+      } else {
         state.items.push(action.payload);
       }
     },

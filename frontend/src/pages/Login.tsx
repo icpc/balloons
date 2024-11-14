@@ -38,12 +38,10 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         infoHolder.setToken(data.token);
         navigate('/');
       }
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
       setError('Произошла ошибка при входе');
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };

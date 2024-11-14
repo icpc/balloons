@@ -50,12 +50,10 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         infoHolder.setToken(data.token);
         navigate('/');
       }
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
       setError('Произошла ошибка при регистрации');
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };

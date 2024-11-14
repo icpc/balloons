@@ -32,8 +32,7 @@ function AppContent() {
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
-    }
-    else {
+    } else {
       localStorage.removeItem('token');
     }
     setToken(newToken);
@@ -50,8 +49,7 @@ function AppContent() {
       });
       const data = await response.json() as Info;
       setInfo({ ...data, status: 'success' });
-    }
-    catch (exc) {
+    } catch (exc) {
       console.error('Error fetching info:', exc);
       setInfo(prevInfo => ({ ...prevInfo, status: 'error' }));
     }
@@ -102,8 +100,7 @@ function AppContent() {
             dispatch(deleteBalloon(message.runId));
             break;
         }
-      }
-      else {
+      } else {
         // Handle initial State
         const state = message;
         dispatch(setContest(state.contest));

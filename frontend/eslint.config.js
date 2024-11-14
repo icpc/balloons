@@ -35,7 +35,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       ...stylistic.configs['recommended-flat'].rules,
-      '@stylistic/semi': ['error', 'always']
+      '@stylistic/semi': ['error', 'always'],
+      '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
     },
   },
 )

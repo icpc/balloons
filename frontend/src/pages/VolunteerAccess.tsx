@@ -25,12 +25,10 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       const data = await response.json() as Volunteer[];
       setVolunteers(data);
       setError(null);
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
       setError('Не удалось загрузить список волонтеров');
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   }, [infoHolder.token]);
@@ -60,12 +58,10 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       setVolunteers(volunteers.map(v =>
         v.id === id ? { ...v, [role]: newValue } : v,
       ));
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
       setError('Не удалось обновить права доступа');
-    }
-    finally {
+    } finally {
       setIsUpdating(null);
     }
   };

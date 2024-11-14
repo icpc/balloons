@@ -16,8 +16,7 @@ export const hallSlice = createSlice({
       state.selectedHall = action.payload;
       if (action.payload) {
         localStorage.setItem('selectedHall', action.payload);
-      }
-      else {
+      } else {
         localStorage.removeItem('selectedHall');
       }
     },
