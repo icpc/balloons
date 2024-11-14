@@ -1,13 +1,13 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { setSelectedHall } from '../store/hallsSlice';
+import { setSelectedHall } from '../store/hallSlice';
 import { useClickOutside } from '../hooks/useClickOutside';
 
 const HallSelector = () => {
   const dispatch = useDispatch();
   const contest = useSelector((state: RootState) => state.contest);
-  const selectedHall = useSelector((state: RootState) => state.halls.selectedHall);
+  const selectedHall = useSelector((state: RootState) => state.hall.selectedHall);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

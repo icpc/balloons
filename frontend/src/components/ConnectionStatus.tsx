@@ -1,7 +1,8 @@
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useState, useEffect } from 'react';
+import { InfoHolder } from '../types';
 
-const ConnectionStatus = () => {
+const ConnectionStatus = ({ infoHolder } : { infoHolder: InfoHolder}) => {
   const ws = useWebSocket();
   const [connectionState, setConnectionState] = useState<number>();
 
@@ -26,6 +27,10 @@ const ConnectionStatus = () => {
       ws.removeEventListener('error', handleStateChange);
     };
   }, [ws]);
+
+  if (!infoHolder.info.canAccess) {
+    return null;
+  }
 
   if (!ws || connectionState === WebSocket.CONNECTING) {
     return <div className="connection-status in-progress" role="alert">Подключение...</div>;

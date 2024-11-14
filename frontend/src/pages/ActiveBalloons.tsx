@@ -50,7 +50,7 @@ const ActiveBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
+    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
   }
 
   return <BalloonsView infoHolder={infoHolder} />

@@ -158,7 +158,7 @@ const VolunteerAccess = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   }
 
   if (!infoHolder.info.canManage) {
-    return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
+    return <GlobalError title="Нет доступа" message="Вы не администратор." />;
   }
 
   return <VolunteerAccessView infoHolder={infoHolder} />;

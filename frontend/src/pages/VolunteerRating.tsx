@@ -19,7 +19,7 @@ const RatingView = () => {
     const stats = new Map<string, number>();
     deliveredBalloons.forEach(balloon => {
       if (balloon.takenBy) {
-        stats.set(balloon.takenBy, (stats.get(balloon.takenBy) || 0) + 1);
+        stats.set(balloon.takenBy, (stats.get(balloon.takenBy) ?? 0) + 1);
       }
     });
 
@@ -61,7 +61,7 @@ const VolunteerRating = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
+    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
   }
 
   return <RatingView />;

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Info, InfoHolder, State, WebSocketMessage } from './types'
+import { Info, InfoHolder, WebSocketMessage } from './types'
 import backendUrls from './util/backendUrls'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -83,8 +83,8 @@ function AppContent() {
       }
     };
 
-    websocket.onmessage = (event) => {
-      const message: WebSocketMessage = JSON.parse(event.data);
+    websocket.onmessage = (event: MessageEvent<string>) => {
+      const message = JSON.parse(event.data) as WebSocketMessage;
       
       if ('type' in message) {
         switch (message.type) {
@@ -100,7 +100,7 @@ function AppContent() {
         }
       } else {
         // Handle initial State
-        const state = message as State;
+        const state = message;
         dispatch(setContest(state.contest));
         dispatch(setBalloons(state.balloons));
       }
@@ -128,14 +128,13 @@ function AppContent() {
       }
       setWs(null);
     };
+    // we shouldn't add ws here
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, info.canAccess, createWebSocket]);
 
   if (info.status === 'loading') {
     return (
-      <div className="global-error">
-        <h1>Loading...</h1>
-        <p>Please wait while we load the application.</p>
-      </div>
+      <GlobalError title="Загрузка" message="Получаем данные с сервера..." />
     );
   }
 
@@ -143,7 +142,7 @@ function AppContent() {
 
   return (
     <WebSocketContext.Provider value={ws}>
-      <ConnectionStatus />
+      <ConnectionStatus infoHolder={infoHolder} />
       <Navbar infoHolder={infoHolder} />
       <Routes>
         <Route path="/" element={<ActiveBalloons infoHolder={infoHolder} />} />
@@ -154,7 +153,7 @@ function AppContent() {
         <Route path="/login" element={<Login infoHolder={infoHolder} />} />
         <Route path="/register" element={<Register infoHolder={infoHolder} />} />
         <Route path="*" element={
-          <GlobalError title="Not Found" message="The page you&apos;re looking for does not exist." />
+          <GlobalError title="404" message="Такой страницы не существует." />
         } />
       </Routes>
       <Footer infoHolder={infoHolder} />

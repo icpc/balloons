@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface HallsState {
+interface HallState {
   selectedHall: string | null;
 }
 
-const initialState: HallsState = {
+const initialState: HallState = {
   selectedHall: localStorage.getItem('selectedHall')
 };
 
-export const hallsSlice = createSlice({
+export const hallSlice = createSlice({
   name: 'halls',
   initialState,
   reducers: {
@@ -23,5 +23,5 @@ export const hallsSlice = createSlice({
   },
 });
 
-export const { setSelectedHall } = hallsSlice.actions;
-export default hallsSlice.reducer; 
+export const { setSelectedHall } = hallSlice.actions;
+export default hallSlice.reducer; 

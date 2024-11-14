@@ -14,7 +14,7 @@ interface TeamStats {
 
 const StandingsView = () => {
   const contest = useSelector((state: RootState) => state.contest);
-  const selectedHall = useSelector((state: RootState) => state.halls.selectedHall);
+  const selectedHall = useSelector((state: RootState) => state.hall.selectedHall);
   const filteredBalloons = useFilteredBalloons();
 
   const teamStats: TeamStats[] = useMemo(() => {
@@ -76,7 +76,7 @@ const Standings = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Forbidden" message="Ask organizer to give you access." />;
+    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
   }
 
   return <StandingsView />;

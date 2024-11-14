@@ -5,7 +5,7 @@ import { RootState } from '../store/store';
 export function useFilteredBalloons() {
   const contest = useSelector((state: RootState) => state.contest);
   const balloons = useSelector((state: RootState) => state.balloons.items);
-  const selectedHall = useSelector((state: RootState) => state.halls.selectedHall);
+  const selectedHall = useSelector((state: RootState) => state.hall.selectedHall);
 
   return useMemo(() => {
     if (!selectedHall) return balloons;
