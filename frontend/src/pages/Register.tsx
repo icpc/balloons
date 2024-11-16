@@ -2,9 +2,11 @@ import { useState, FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import backendUrls from '../util/backendUrls';
+import { useTranslation } from 'react-i18next';
 
 const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,12 +22,12 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
     setError(null);
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+      setError(t('auth.errors.passwordTooShort'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
+      setError(t('auth.errors.passwordMismatch'));
       return;
     }
 
@@ -41,7 +43,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       });
 
       if (response.status === 409) {
-        setError('Пользователь с таким логином уже существует');
+        setError(t('auth.errors.userExists'));
         return;
       }
 
@@ -52,7 +54,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       }
     } catch (err) {
       console.error(err);
-      setError('Произошла ошибка при регистрации');
+      setError(t('auth.errors.registrationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -60,9 +62,9 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   return (
     <main>
-      <h1 className="sr-only">Регистрация</h1>
+      <h1 className="sr-only">{t('auth.register')}</h1>
       <form onSubmit={(e) => { void handleSubmit(e); }}>
-        <label htmlFor="login">Логин</label>
+        <label htmlFor="login">{t('auth.username')}</label>
         <input
           type="text"
           id="login"
@@ -74,7 +76,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           autoCapitalize="none"
           autoCorrect="false"
         />
-        <label htmlFor="password">Пароль</label>
+        <label htmlFor="password">{t('auth.password')}</label>
         <input
           type="password"
           id="password"
@@ -84,7 +86,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           required
           minLength={6}
         />
-        <label htmlFor="confirmPassword">Повторите пароль</label>
+        <label htmlFor="confirmPassword">{t('auth.confirmPassword')}</label>
         <input
           type="password"
           id="confirmPassword"
@@ -102,7 +104,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? 'Загрузка...' : 'Зарегистрироваться'}
+          {isLoading ? t('common.loading') : t('auth.registerButton')}
         </button>
       </form>
     </main>

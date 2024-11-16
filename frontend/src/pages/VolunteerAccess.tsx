@@ -3,8 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { InfoHolder, Volunteer } from '../types';
 import backendUrls from '../util/backendUrls';
 import { GlobalError } from '../components/GlobalError';
+import { useTranslation } from 'react-i18next';
 
 const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,11 +29,11 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       setError(null);
     } catch (err) {
       console.error(err);
-      setError('Не удалось загрузить список волонтеров');
+      setError(t('volunteers.loadError'));
     } finally {
       setIsLoading(false);
     }
-  }, [infoHolder.token]);
+  }, [infoHolder.token, t]);
 
   useEffect(() => {
     void fetchVolunteers();
@@ -60,7 +62,7 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       ));
     } catch (err) {
       console.error(err);
-      setError('Не удалось обновить права доступа');
+      setError(t('volunteers.updateError'));
     } finally {
       setIsUpdating(null);
     }
@@ -71,7 +73,7 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       <div className="container mt-5">
         <div className="text-center">
           <div className="spinner-border" role="status">
-            <span className="visually-hidden">Загрузка...</span>
+            <span className="visually-hidden">{t('volunteers.loading')}</span>
           </div>
         </div>
       </div>
@@ -80,22 +82,25 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   return (
     <main>
-      <h1 className="sr-only">Управление доступом волонтёров</h1>
+      <h1 className="sr-only">{t('volunteers.title')}</h1>
       {error && (
         <div className="form-error" role="alert">
           {error}
-          <a onClick={() => setError(null)}> Закрыть</a>
+          <a onClick={() => setError(null)}>
+            {' '}
+            {t('common.close')}
+          </a>
         </div>
       )}
       <table className="volunteer-access">
         <thead>
           <tr>
-            <th rowSpan={2} style={{ verticalAlign: 'bottom' }}>Логин</th>
-            <th colSpan={2} style={{ textAlign: 'center' }}>Доступы</th>
+            <th rowSpan={2} style={{ verticalAlign: 'bottom' }}>{t('volunteers.table.login')}</th>
+            <th colSpan={2} style={{ textAlign: 'center' }}>{t('volunteers.table.access')}</th>
           </tr>
           <tr>
-            <th>Шарики</th>
-            <th>Волонтеры</th>
+            <th>{t('volunteers.table.balloons')}</th>
+            <th>{t('volunteers.table.volunteers')}</th>
           </tr>
         </thead>
         <tbody>
@@ -103,7 +108,7 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
             ? (
                 <tr>
                   <td colSpan={3} className="text-center">
-                    {error ? 'Не удалось загрузить данные' : 'Нет волонтеров'}
+                    {error ? t('volunteers.loadError') : t('volunteers.noVolunteers')}
                   </td>
                 </tr>
               )
@@ -124,7 +129,7 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
                             onClick={() => void handleRoleChange(volunteer.id, 'canAccess', !volunteer.canAccess)}
                             className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
                           >
-                            {isUpdatingThis ? '...' : (volunteer.canAccess ? 'Отозвать' : 'Выдать')}
+                            {isUpdatingThis ? '...' : (volunteer.canAccess ? t('volunteers.table.revoke') : t('volunteers.table.grant'))}
                           </a>
                         )}
                       </td>
@@ -133,13 +138,13 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
                           <span>
                             {volunteer.canManage ? '✔️ ' : '❌ '}
                           </span>
-                          {isSelf && 'Это вы'}
+                          {isSelf && t('volunteers.table.thatsYou')}
                           {!isSelf && (
                             <a
                               onClick={() => void handleRoleChange(volunteer.id, 'canManage', !volunteer.canManage)}
                               className={isUpdatingThis ? 'disabled access-link' : 'access-link'}
                             >
-                              {isUpdatingThis ? '...' : (volunteer.canManage ? 'Отозвать' : 'Выдать')}
+                              {isUpdatingThis ? '...' : (volunteer.canManage ? t('volunteers.table.revoke') : t('volunteers.table.grant'))}
                             </a>
                           )}
                         </div>
@@ -155,12 +160,19 @@ const VolunteerAccessView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 };
 
 const VolunteerAccess = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
+
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
   if (!infoHolder.info.canManage) {
-    return <GlobalError title="Нет доступа" message="Вы не администратор." />;
+    return (
+      <GlobalError
+        title={t('errors.noAccess')}
+        message={t('errors.notAdmin')}
+      />
+    );
   }
 
   return <VolunteerAccessView infoHolder={infoHolder} />;

@@ -11,6 +11,7 @@ export interface Info {
   canAccess?: boolean
   canManage?: boolean
   status: string
+  language: 'RU' | 'EN'
 };
 
 export interface Volunteer {

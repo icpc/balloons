@@ -1,11 +1,13 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { RootState } from '../store/store';
 import { setSelectedHall } from '../store/hallSlice';
 import { useClickOutside } from '../hooks/useClickOutside';
 
 const HallSelector = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const contest = useSelector((state: RootState) => state.contest);
   const selectedHall = useSelector((state: RootState) => state.hall.selectedHall);
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +41,7 @@ const HallSelector = () => {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        {selectedHall ? `Холл ${selectedHall}` : 'Все холлы'}
+        {selectedHall ? `${t('halls.hall')} ${selectedHall}` : t('halls.allHalls')}
         <span className="dropdown-arrow"></span>
       </span>
       {isOpen && (
@@ -48,7 +50,7 @@ const HallSelector = () => {
             className={!selectedHall ? 'active' : ''}
             onClick={() => handleSelect(null)}
           >
-            Все холлы
+            {t('halls.allHalls')}
           </li>
           {halls.map(hall => (
             <li
@@ -56,7 +58,7 @@ const HallSelector = () => {
               className={selectedHall === hall ? 'active' : ''}
               onClick={() => handleSelect(hall)}
             >
-              Холл
+              {t('halls.hall')}
               {' '}
               {hall}
             </li>

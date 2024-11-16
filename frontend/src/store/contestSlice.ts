@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Contest } from '../types';
 
 const initialState: Contest = {
-  name: 'Загрузка...',
+  name: '...',
   teams: [],
   problems: [],
 };

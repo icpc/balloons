@@ -6,6 +6,7 @@ import { InfoHolder, Team } from '../types';
 import { GlobalError } from '../components/GlobalError';
 import ProblemBox from '../components/ProblemBox';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
+import { useTranslation } from 'react-i18next';
 
 interface TeamStats {
   team: Team
@@ -13,6 +14,7 @@ interface TeamStats {
 }
 
 const StandingsView = () => {
+  const { t } = useTranslation();
   const contest = useSelector((state: RootState) => state.contest);
   const selectedHall = useSelector((state: RootState) => state.hall.selectedHall);
   const filteredBalloons = useFilteredBalloons();
@@ -39,15 +41,15 @@ const StandingsView = () => {
 
   return (
     <main>
-      <h1 className="sr-only">Турнирная таблица</h1>
+      <h1 className="sr-only">{t('standings.title')}</h1>
       <table className="standings">
         <thead>
           <tr>
-            <th className="team-place">Место</th>
+            <th className="team-place">{t('standings.place')}</th>
             {contest.problems.map(problem => (
               <th className="team-problem" key={problem.id}>{problem.alias}</th>
             ))}
-            <th className="team-name">Команда</th>
+            <th className="team-name">{t('standings.team')}</th>
           </tr>
         </thead>
         <tbody>
@@ -73,12 +75,19 @@ const StandingsView = () => {
 };
 
 const Standings = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
+
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
+    return (
+      <GlobalError
+        title={t('errors.noAccess')}
+        message={t('errors.contactAdmin')}
+      />
+    );
   }
 
   return <StandingsView />;

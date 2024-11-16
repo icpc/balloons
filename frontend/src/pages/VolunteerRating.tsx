@@ -4,6 +4,7 @@ import { RootState } from '../store/store';
 import { Navigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { GlobalError } from '../components/GlobalError';
+import { useTranslation } from 'react-i18next';
 
 interface VolunteerStats {
   login: string
@@ -11,6 +12,7 @@ interface VolunteerStats {
 }
 
 const RatingView = () => {
+  const { t } = useTranslation();
   const balloons = useSelector((state: RootState) => state.balloons.items);
 
   const volunteerStats = useMemo(() => {
@@ -29,17 +31,17 @@ const RatingView = () => {
   }, [balloons]);
 
   if (volunteerStats.length === 0) {
-    return <p>Нет доставленных шариков</p>;
+    return <p>{t('volunteers.rating.noDeliveredBalloons')}</p>;
   }
 
   return (
     <main>
-      <h1 className="sr-only">Рейтинг волонтёров</h1>
+      <h1 className="sr-only">{t('volunteers.rating.title')}</h1>
       <table>
         <thead>
           <tr>
-            <th>Волонтёр</th>
-            <th>Доставлено</th>
+            <th>{t('volunteers.rating.volunteer')}</th>
+            <th>{t('volunteers.rating.delivered')}</th>
           </tr>
         </thead>
         <tbody>
@@ -56,12 +58,19 @@ const RatingView = () => {
 };
 
 const VolunteerRating = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
+
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
+    return (
+      <GlobalError
+        title={t('errors.noAccess')}
+        message={t('errors.contactAdmin')}
+      />
+    );
   }
 
   return <RatingView />;

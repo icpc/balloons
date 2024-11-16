@@ -85,7 +85,7 @@ object Application : CliktCommand("balloons") {
                 }
                 adminController(volunteerRepository)
                 authController(secretKeyRepository, volunteerRepository, balloonSettings.disableRegistration)
-                contestController(eventStream, webSocketAuthenticator, balloonSettings.disableRegistration)
+                contestController(eventStream, webSocketAuthenticator, balloonSettings)
             }
         }.start(wait = true)
     }

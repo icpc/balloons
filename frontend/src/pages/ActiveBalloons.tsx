@@ -8,8 +8,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
+import { useTranslation } from 'react-i18next';
 
 const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
   const ws = useWebSocket();
   const contest = useSelector((state: RootState) => state.contest);
   const filteredBalloons = useFilteredBalloons();
@@ -28,33 +30,41 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   return (
     <main className="balloons-main">
-      <h2 className="sr-only">Шарики</h2>
+      <h2 className="sr-only">{t('balloons.title')}</h2>
       <div className="contest-name"><strong>{contest.name}</strong></div>
       <ProblemList contest={contest} balloons={filteredBalloons} />
       <BalloonList
-        title="Вы несёте"
+        title={t('balloons.youCarry')}
         balloons={myBalloons}
         contest={contest}
         actions={balloon => (
           <>
-            <a onClick={() => ws?.send(JSON.stringify({ type: 'deliverBalloon', runId: balloon.runId }))}>Готово</a>
-            <a onClick={() => ws?.send(JSON.stringify({ type: 'dropBalloon', runId: balloon.runId }))}>Отказаться</a>
+            <a onClick={() => ws?.send(JSON.stringify({ type: 'deliverBalloon', runId: balloon.runId }))}>
+              {t('balloons.actions.done')}
+            </a>
+            <a onClick={() => ws?.send(JSON.stringify({ type: 'dropBalloon', runId: balloon.runId }))}>
+              {t('balloons.actions.drop')}
+            </a>
           </>
         )}
       />
       <BalloonList
-        title="Можно нести"
+        title={t('balloons.available')}
         balloons={queuedBalloons}
         contest={contest}
-        actions={balloon => <a onClick={() => ws?.send(JSON.stringify({ type: 'takeBalloon', runId: balloon.runId }))}>Взять</a>}
+        actions={balloon => (
+          <a onClick={() => ws?.send(JSON.stringify({ type: 'takeBalloon', runId: balloon.runId }))}>
+            {t('balloons.actions.take')}
+          </a>
+        )}
       />
       <BalloonList
-        title="В пути"
+        title={t('balloons.inProgress')}
         balloons={takenBalloons}
         contest={contest}
         actions={balloon => (
           <span>
-            Несёт
+            {t('balloons.carriedBy')}
             {balloon.takenBy}
           </span>
         )}
@@ -64,12 +74,19 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 };
 
 const ActiveBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
+
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
+    return (
+      <GlobalError
+        title={t('errors.noAccess')}
+        message={t('errors.contactAdmin')}
+      />
+    );
   }
 
   return <BalloonsView infoHolder={infoHolder} />;

@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.icpclive.balloons.BalloonOptions
+import org.icpclive.balloons.Language
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.auth.WebSocketAuthenticator
 import org.icpclive.cds.util.getLogger
@@ -24,23 +26,29 @@ data class UserInfo(
     val login: String? = null,
     val canAccess: Boolean? = null,
     val canManage: Boolean? = null,
+    val language: Language,
 )
 
 fun Route.contestController(
     eventStream: EventStream,
     webSocketAuthenticator: WebSocketAuthenticator,
-    disableRegistration: Boolean,
+    settings: BalloonOptions,
 ) {
     authenticate(optional = true) {
         get("/api/info") {
             val principal = call.principal<VolunteerPrincipal>()
 
             if (principal == null) {
-                call.respond(UserInfo(canRegister = !disableRegistration))
+                call.respond(UserInfo(canRegister = !settings.disableRegistration, language = settings.lang))
             } else {
                 val volunteer = principal.volunteer
                 call.respond(
-                    UserInfo(login = volunteer.login, canAccess = volunteer.canAccess, canManage = volunteer.canManage),
+                    UserInfo(
+                        login = volunteer.login,
+                        canAccess = volunteer.canAccess,
+                        canManage = volunteer.canManage,
+                        language = settings.lang,
+                    ),
                 )
             }
         }

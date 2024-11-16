@@ -2,9 +2,11 @@ import { useState, FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import backendUrls from '../util/backendUrls';
+import { useTranslation } from 'react-i18next';
 
 const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +31,7 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       });
 
       if (response.status === 403) {
-        setError('Неверный логин или пароль');
+        setError(t('auth.errors.invalidCredentials'));
         return;
       }
 
@@ -40,7 +42,7 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       }
     } catch (err) {
       console.error(err);
-      setError('Произошла ошибка при входе');
+      setError(t('auth.errors.loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -48,9 +50,9 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   return (
     <main>
-      <h1 className="sr-only">Вход</h1>
+      <h1 className="sr-only">{t('auth.login')}</h1>
       <form onSubmit={(e) => { void handleSubmit(e); }}>
-        <label htmlFor="login">Логин</label>
+        <label htmlFor="login">{t('auth.username')}</label>
         <input
           type="text"
           id="login"
@@ -62,7 +64,7 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           autoCapitalize="none"
           autoCorrect="false"
         />
-        <label htmlFor="password">Пароль</label>
+        <label htmlFor="password">{t('auth.password')}</label>
         <input
           type="password"
           id="password"
@@ -80,7 +82,7 @@ const Login = ({ infoHolder }: { infoHolder: InfoHolder }) => {
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? 'Загрузка...' : 'Войти'}
+          {isLoading ? t('common.loading') : t('auth.loginButton')}
         </button>
       </form>
     </main>

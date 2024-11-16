@@ -7,8 +7,10 @@ import BalloonList from '../components/BalloonList';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
+import { useTranslation } from 'react-i18next';
 
 const BalloonsView = () => {
+  const { t } = useTranslation();
   const contest = useSelector((state: RootState) => state.contest);
   const filteredBalloons = useFilteredBalloons();
 
@@ -18,16 +20,16 @@ const BalloonsView = () => {
 
   return (
     <main className="balloons-main">
-      <h2 className="sr-only">Доставленные шарики</h2>
+      <h2 className="sr-only">{t('balloons.deliveredTitle')}</h2>
       <div className="contest-name"><strong>{contest.name}</strong></div>
       <ProblemList contest={contest} balloons={filteredBalloons} />
       <BalloonList
-        title="Доставлены"
+        title={t('balloons.delivered')}
         balloons={deliveredBalloons}
         contest={contest}
         actions={balloon => (
           <span>
-            Доставлен
+            {t('balloons.deliveredBy')}
             {balloon.takenBy ?? ''}
           </span>
         )}
@@ -37,12 +39,19 @@ const BalloonsView = () => {
 };
 
 const DeliveredBalloons = ({ infoHolder }: { infoHolder: InfoHolder }) => {
+  const { t } = useTranslation();
+
   if (!infoHolder.info.login) {
     return <Navigate to="/login" />;
   }
 
   if (!infoHolder.info.canAccess) {
-    return <GlobalError title="Нет доступа" message="Сообщите организатору ваш логин, чтобы его получить." />;
+    return (
+      <GlobalError
+        title={t('errors.noAccess')}
+        message={t('errors.contactAdmin')}
+      />
+    );
   }
 
   return <BalloonsView />;

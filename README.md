@@ -79,6 +79,13 @@ This task should do the trick.
 gradle shadowJar
 ```
 
+### Translation Guide
+
+1. Add `frontend/src/i18n/<your-lang-code>.ts` file. Use the same structure as other localization files.
+2. Add your language in `src/main/kotlin/org/icpclive/balloons/BalloonOptions.kt`.
+
+Voilà! I'm waiting for your pull requests.
+
 ## License
 
 You may use this repository code according to [The MIT License](LICENSE) terms.

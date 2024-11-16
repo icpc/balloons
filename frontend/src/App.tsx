@@ -19,13 +19,16 @@ import DeliveredBalloons from './pages/DeliveredBalloons';
 import VolunteerRating from './pages/VolunteerRating';
 import Standings from './pages/Standings';
 import ConnectionStatus from './components/ConnectionStatus';
+import { useTranslation } from 'react-i18next';
+import i18n from './i18n/config';
 
 const RECONNECT_DELAY = 3000; // 3 seconds
 
 function AppContent() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
-  const [info, setInfo] = useState<Info>({ status: 'loading' });
+  const [info, setInfo] = useState<Info>({ status: 'loading', language: 'EN' });
   const [ws, setWs] = useState<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number>();
 
@@ -58,6 +61,12 @@ function AppContent() {
   useEffect(() => {
     void fetchInfo();
   }, [fetchInfo]);
+
+  useEffect(() => {
+    if (info.language) {
+      void i18n.changeLanguage(info.language.toLowerCase());
+    }
+  }, [info.language]);
 
   const createWebSocket = useCallback(() => {
     const websocket = new WebSocket(
@@ -136,7 +145,10 @@ function AppContent() {
 
   if (info.status === 'loading') {
     return (
-      <GlobalError title="Загрузка" message="Получаем данные с сервера..." />
+      <GlobalError
+        title={t('common.loading')}
+        message={t('app.fetchingData')}
+      />
     );
   }
 
@@ -156,9 +168,12 @@ function AppContent() {
         <Route path="/register" element={<Register infoHolder={infoHolder} />} />
         <Route
           path="*"
-          element={
-            <GlobalError title="404" message="Такой страницы не существует." />
-          }
+          element={(
+            <GlobalError
+              title="404"
+              message={t('errors.pageNotFound')}
+            />
+          )}
         />
       </Routes>
       <Footer infoHolder={infoHolder} />
