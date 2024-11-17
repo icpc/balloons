@@ -1,6 +1,8 @@
 package org.icpclive.balloons.db
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import org.icpclive.balloons.db.tables.records.VolunteerRecord
 import org.icpclive.balloons.db.tables.references.VOLUNTEER
 import org.jooq.DSLContext
@@ -21,7 +23,7 @@ class VolunteerRepository(private val jooq: DSLContext) {
     /**
      * @return registered [VolunteerRecord] on success, `null` on failure
      */
-    fun register(
+    suspend fun register(
         login: String,
         password: String,
         canAccess: Boolean,
@@ -38,17 +40,19 @@ class VolunteerRepository(private val jooq: DSLContext) {
                     .set(VOLUNTEER.CAN_ACCESS, canAccess)
                     .set(VOLUNTEER.CAN_MANAGE, canManage),
             ),
-        ).fetchOne()
+        ).awaitFirstOrNull()
 
-    fun setPassword(
+    suspend fun setPassword(
         id: Long,
         password: String,
-    ) = jooq.update(VOLUNTEER)
-        .set(VOLUNTEER.PASSWORD_HASH, getHash(password))
-        .where(VOLUNTEER.ID.eq(id))
-        .execute()
+    ) {
+        jooq.update(VOLUNTEER)
+            .set(VOLUNTEER.PASSWORD_HASH, getHash(password))
+            .where(VOLUNTEER.ID.eq(id))
+            .awaitSingle()
+    }
 
-    fun updateFlags(
+    suspend fun updateFlags(
         id: Long,
         canAccess: Boolean? = null,
         canManage: Boolean? = null,
@@ -62,7 +66,7 @@ class VolunteerRepository(private val jooq: DSLContext) {
         canAccess?.let { query.set(VOLUNTEER.CAN_ACCESS, it) }
         canManage?.let { query.set(VOLUNTEER.CAN_MANAGE, it) }
 
-        (query as UpdateSetMoreStep<*>).where(VOLUNTEER.ID.eq(id)).execute()
+        (query as UpdateSetMoreStep<*>).where(VOLUNTEER.ID.eq(id)).awaitSingle()
     }
 
     private fun getHash(password: String): String = bcryptHasher.hashToString(BCRYPT_COST, password.toCharArray())

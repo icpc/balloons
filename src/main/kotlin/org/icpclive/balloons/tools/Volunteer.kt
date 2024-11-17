@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import kotlinx.coroutines.runBlocking
 import org.icpclive.balloons.db.VolunteerRepository
 import org.icpclive.cds.util.getLogger
 import kotlin.system.exitProcess
@@ -32,11 +33,13 @@ object CreateVolunteer : CliktCommand("create") {
     private val volunteerRepository: VolunteerRepository by requireObject("volunteerRepository")
 
     override fun run() {
-        if (volunteerRepository.register(login, password, canAccess = true, canManage = admin) != null) {
-            logger.info { "Volunteer $login created" }
-        } else {
-            logger.error { "Volunteer not created: probably it already exists." }
-            exitProcess(1)
+        runBlocking {
+            if (volunteerRepository.register(login, password, canAccess = true, canManage = admin) != null) {
+                logger.info { "Volunteer $login created" }
+            } else {
+                logger.error { "Volunteer not created: probably it already exists." }
+                exitProcess(1)
+            }
         }
     }
 }
@@ -63,13 +66,15 @@ object UpdateVolunteer : CliktCommand("update") {
             exitProcess(1)
         }
 
-        newPassword?.let {
-            volunteerRepository.setPassword(volunteer.id!!, it)
-            logger.info { "Password for volunteer $login updated" }
-        }
-        if (makeAdmin) {
-            volunteerRepository.updateFlags(volunteer.id!!, canManage = true)
-            logger.info { "Volunteer $login is admin now" }
+        runBlocking {
+            newPassword?.let {
+                volunteerRepository.setPassword(volunteer.id!!, it)
+                logger.info { "Password for volunteer $login updated" }
+            }
+            if (makeAdmin) {
+                volunteerRepository.updateFlags(volunteer.id!!, canManage = true)
+                logger.info { "Volunteer $login is admin now" }
+            }
         }
     }
 }

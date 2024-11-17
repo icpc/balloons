@@ -11,7 +11,6 @@ object H2Shell : CliktCommand("h2shell") {
     private val databaseConfig: DatabaseConfig by requireObject("databaseConfig")
 
     override fun run() {
-        println(currentContext.parent?.data)
         org.h2.tools.Shell.main("-url", databaseConfig.toJdbcUrl())
     }
 }
