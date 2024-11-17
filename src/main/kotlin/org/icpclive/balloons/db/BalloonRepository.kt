@@ -1,5 +1,7 @@
 package org.icpclive.balloons.db
 
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import org.icpclive.balloons.db.tables.references.BALLOON
 import org.icpclive.balloons.db.tables.references.VOLUNTEER
 import org.icpclive.balloons.event.Balloon
@@ -10,7 +12,7 @@ class BalloonRepository(private val jooq: DSLContext) {
     /**
      * @return record containing delivery status (`BALLOON.DELIVERED`) and responsible volunteer login (`VOLUNTEER.LOGIN`)
      */
-    fun getDelivery(balloon: Balloon): Record? =
+    suspend fun getDelivery(balloon: Balloon): Record? =
         jooq.select(BALLOON.DELIVERED, VOLUNTEER.LOGIN)
             .from(BALLOON)
             .leftJoin(VOLUNTEER).on(BALLOON.VOLUNTEER_ID.eq(VOLUNTEER.ID))
@@ -18,12 +20,12 @@ class BalloonRepository(private val jooq: DSLContext) {
                 BALLOON.PROBLEM_ID.eq(balloon.problemId),
                 BALLOON.TEAM_ID.eq(balloon.teamId),
             )
-            .fetchOne()
+            .awaitFirstOrNull()
 
     /**
      * @return `true` if balloon is reserved for this volunteer (even if it already was), `false` otherwise
      */
-    fun reserveBalloon(
+    suspend fun reserveBalloon(
         balloon: Balloon,
         volunteerId: Long,
     ): Boolean =
@@ -39,12 +41,12 @@ class BalloonRepository(private val jooq: DSLContext) {
             .set(BALLOON.PROBLEM_ID, balloon.problemId)
             .set(BALLOON.TEAM_ID, balloon.teamId)
             .set(BALLOON.VOLUNTEER_ID, volunteerId)
-            .execute() > 0
+            .awaitSingle() > 0
 
     /**
      * @return `true` if balloon was dropped, `false` otherwise
      */
-    fun dropBalloon(
+    suspend fun dropBalloon(
         balloon: Balloon,
         volunteerId: Long,
     ): Boolean =
@@ -56,12 +58,12 @@ class BalloonRepository(private val jooq: DSLContext) {
                 BALLOON.VOLUNTEER_ID.eq(volunteerId),
                 BALLOON.DELIVERED.eq(false),
             )
-            .execute() > 0
+            .awaitSingle() > 0
 
     /**
      * @return `true` if balloon is delivered (even if it already was), `false` otherwise
      */
-    fun deliverBalloon(
+    suspend fun deliverBalloon(
         balloon: Balloon,
         volunteerId: Long,
     ): Boolean =
@@ -72,5 +74,5 @@ class BalloonRepository(private val jooq: DSLContext) {
                 BALLOON.TEAM_ID.eq(balloon.teamId),
                 BALLOON.VOLUNTEER_ID.eq(volunteerId),
             )
-            .execute() > 0
+            .awaitSingle() > 0
 }

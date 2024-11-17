@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.h2)
-    implementation(libs.jooq.kotlin)
+    implementation(libs.bundles.jooq)
     implementation(libs.bcrypt)
 
     testImplementation(libs.ktor.server.test.host)

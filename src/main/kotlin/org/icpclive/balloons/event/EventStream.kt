@@ -20,7 +20,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
     /**
      * @return `true` if command succeeded, `false` otherwise (in case of concurrent modification, etc.)
      */
-    fun processCommand(
+    suspend fun processCommand(
         command: Command,
         volunteerId: Long,
     ): Boolean =
@@ -28,7 +28,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
             is BalloonCommand -> processBalloonCommand(command, volunteerId)
         }
 
-    private fun processBalloonCommand(
+    private suspend fun processBalloonCommand(
         command: BalloonCommand,
         volunteerId: Long,
     ): Boolean {
@@ -75,7 +75,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
     }
 
     // This can be written in non-concurrent fashion.
-    fun processRun(runInfo: RunInfo) {
+    suspend fun processRun(runInfo: RunInfo) {
         val runId = runInfo.id.value
 
         val existingRun = runs.value.find { it.runId == runId }
@@ -108,7 +108,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
     /**
      * Recalculates current state by [runs] and commits it to [sink].
      */
-    private fun synchronizeProblemState(
+    private suspend fun synchronizeProblemState(
         problemId: String,
         teamId: String,
     ) {
@@ -124,7 +124,7 @@ class EventStream(private val balloonRepository: BalloonRepository) {
         }
 
         if (actualRun != null) {
-            val targetBalloon = actualRun.toBalloon(isFTS = actualRun.runId == actualFTS?.runId).withDelivery()
+            val targetBalloon = actualRun.toBalloon(isFTS = actualRun.runId == actualFTS?.runId)
 
             if (existingBalloon != targetBalloon) {
                 updateSink(BalloonUpdated(targetBalloon))
@@ -173,11 +173,11 @@ class EventStream(private val balloonRepository: BalloonRepository) {
             is RunResult.InProgress -> false
         }
 
-    private fun Run.toBalloon(isFTS: Boolean) =
+    private suspend fun Run.toBalloon(isFTS: Boolean) =
         Balloon(runId, isFTS, teamId, problemId, time)
             .withDelivery()
 
-    private fun Balloon.withDelivery(): Balloon {
+    private suspend fun Balloon.withDelivery(): Balloon {
         val delivery = balloonRepository.getDelivery(this)
         return this.copy(
             takenBy = delivery?.get(VOLUNTEER.LOGIN),

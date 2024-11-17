@@ -9,6 +9,7 @@ import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -55,7 +56,12 @@ fun Route.contestController(
     }
 
     webSocket("/api/balloons") {
-        val principal = webSocketAuthenticator.authenticate(this)
+        val principal =
+            try {
+                webSocketAuthenticator.authenticate(this)
+            } catch (exc: ClosedReceiveChannelException) {
+                return@webSocket
+            }
 
         if (principal?.volunteer?.canAccess != true) {
             send("""{"error": "access denied"}""")
@@ -76,7 +82,7 @@ fun Route.contestController(
                 }
             }
 
-        runCatching {
+        try {
             incoming.consumeEach { frame ->
                 if (frame !is Frame.Text) {
                     return@consumeEach
@@ -87,9 +93,11 @@ fun Route.contestController(
                     send("""{"error": "command failed"}""")
                 }
             }
-        }.onFailure { exception ->
-            logger.warning { "WebSocket exception: ${exception.localizedMessage}" }
-        }.also {
+        } catch (ignored: ClosedReceiveChannelException) {
+        } catch (exc: Exception) {
+            logger.warning { "WebSocket exception: ${exc.localizedMessage}" }
+            throw exc
+        } finally {
             outgoingStream.cancel()
         }
     }
