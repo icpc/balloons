@@ -1,3 +1,4 @@
+import nu.studer.gradle.jooq.JooqGenerate
 import org.jooq.meta.jaxb.Logging
 
 plugins {
@@ -50,7 +51,6 @@ jooq {
 
     configurations {
         create("main") {
-            generateSchemaSourceOnCompilation
             generateSchemaSourceOnCompilation = true
             jooqConfiguration.apply {
                 logging = Logging.WARN
@@ -83,13 +83,17 @@ jooq {
 }
 
 tasks {
+    named<JooqGenerate>("generateJooq") {
+        inputs.file("src/main/resources/schema.sql")
+        allInputsDeclared = true
+    }
+
     named<Test>("test") {
         useJUnitPlatform()
     }
 
     shadowJar {
         mergeServiceFiles()
-
         archiveClassifier = null
     }
 
