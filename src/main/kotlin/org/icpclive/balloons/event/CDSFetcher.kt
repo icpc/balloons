@@ -7,13 +7,14 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
 import org.icpclive.cds.InfoUpdate
 import org.icpclive.cds.RunUpdate
+import org.icpclive.cds.adapters.addComputedData
 import org.icpclive.cds.cli.CdsCommandLineOptions
 
 class CDSFetcher(
     private val eventStream: EventStream,
     settings: CdsCommandLineOptions,
 ) {
-    private val cds = settings.toFlow()
+    private val cds = settings.toFlow().addComputedData()
 
     suspend fun run() {
         cds.buffer(capacity = UNLIMITED).collect { event ->

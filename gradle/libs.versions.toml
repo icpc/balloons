@@ -22,7 +22,7 @@ bcrypt = { module = "at.favre.lib:bcrypt", version = "0.10.2" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
-live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version = "2177452c13f33b944e39e4fbecf2a683661d3ca3" }
+live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version = "3.4.0" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }
