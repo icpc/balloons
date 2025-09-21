@@ -24,7 +24,7 @@ const Footer = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         </>
       )}
       <span>
-        <a href="https://github.com/nsychev/balloons-reborn" target="_blank" rel="noopener noreferrer">Open&nbsp;source</a>
+        <a href="https://github.com/icpc/balloons" target="_blank" rel="noopener noreferrer">Open&nbsp;source</a>
       </span>
     </footer>
   );

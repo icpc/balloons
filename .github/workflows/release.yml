@@ -1,0 +1,83 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.0'
+          cache: 'pnpm'
+          cache-dependency-path: 'frontend/pnpm-lock.yaml'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: pnpm install
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Determine released version
+        id: version
+        run: |
+          RELEASE_VERSION=${GITHUB_REF#refs/tags/v}
+          GRADLE_VERSION=$(grep 'version = ' build.gradle.kts | sed 's/.*version = "\([^"]*\)".*/\1/')
+          echo "Release version: $RELEASE_VERSION"
+          echo "Gradle version: $GRADLE_VERSION"
+          if [ "$RELEASE_VERSION" != "$GRADLE_VERSION" ]; then
+            echo "❌ Release version ($RELEASE_VERSION) does not match build.gradle.kts version ($GRADLE_VERSION)"
+            exit 1
+          fi
+          echo "version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build and create release artifacts
+        run: ./gradlew --no-daemon -Pnpm.download=false -Pballoons.embedFrontend=true shadowJar release
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload JAR artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/libs/balloons-${{ steps.version.outputs.version }}.jar
+          asset_name: balloons-${{ steps.version.outputs.version }}.jar
+          asset_content_type: application/java-archive
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/artifacts/balloons-${{ steps.version.outputs.version }}.zip
+          asset_name: balloons-${{ steps.version.outputs.version }}.zip
+          asset_content_type: application/zip

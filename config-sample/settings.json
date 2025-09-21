@@ -1,8 +1,0 @@
-{
-  "type":"pcms",
-  "source":"https://nerc.itmo.ru/archive/2023/nef-2023-real.xml",
-  "emulation": {
-    "startTime": "now",
-    "speed": 10
-  }
-}

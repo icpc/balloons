@@ -1,9 +1,10 @@
 [versions]
-jooq = "3.19.1"
+jooq = "3.20.7"
 h2 = "2.3.232"
-kotlin = "2.0.21"
-ktor = "3.0.1"
-logback = "1.5.12"
+kotlin = "2.2.20"
+ktor = "3.3.0"
+live = "e1ce1f946c080209df8040d44b014f921fdeffe8"
+logback = "1.5.18"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
@@ -22,7 +23,8 @@ bcrypt = { module = "at.favre.lib:bcrypt", version = "0.10.2" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
-live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version = "3.4.0" }
+live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version.ref = "live" }
+live-schemas = { module = "com.github.icpc.live-v3:org.icpclive.cds.schemas", version.ref = "live" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }
@@ -45,7 +47,7 @@ ktor = [
 jooq = ["jooq-kotlin", "jooq-kotlin-coroutines"]
 
 [plugins]
-jooq = { id = "nu.studer.jooq", version = "9.0" }
+jooq = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 node = { id = "com.github.node-gradle.node", version = "7.1.0" }

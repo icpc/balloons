@@ -10,12 +10,13 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
-import kotlinx.datetime.Clock
-import kotlinx.datetime.toJavaInstant
 import kotlinx.serialization.Serializable
 import org.icpclive.balloons.db.SecretKeyRepository
 import org.icpclive.balloons.db.VolunteerRepository
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
 
 @Serializable
 data class Credentials(
@@ -23,6 +24,7 @@ data class Credentials(
     val password: String,
 )
 
+@OptIn(ExperimentalTime::class)
 fun Route.authController(
     secretKeyRepository: SecretKeyRepository,
     volunteerRepository: VolunteerRepository,

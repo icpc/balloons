@@ -2,13 +2,35 @@
 
 ## Requirements
 
-* Java 17
+* Java 21
 
 ## Setup
 
 Use the same configs as in [ICPC Live Overlay v3](https://github.com/icpc/live-v3). That's all!
 
+Examples:
+- [CLICS format (ICPC WF)](https://github.com/icpc/live-v3/blob/main/config/_examples/clics/settings.json)
+- [Codeforces](https://github.com/icpc/live-v3/blob/main/config/_examples/codeforces/settings.json)
+
+Also you can customize data received from test system. We support
+[all options](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md) from ICPC Live, but you most likely
+need to:
+* [set balloon colors for each problem](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md#change-problem-info)
+* put `custom-fields.csv` in the config directory with columns `team_id,hall,place`
+  * place will be displayed near the team name so you'll be able to find the team at the contest floor
+  * if you run distributed contest (or just have many rooms in the same building),
+    you’ll be able to filter teams by their hall
+
 ## Launch
+
+When using ZIP release, you can use provided scripts:
+
+```bash
+./balloons.sh  # Unix-like systems
+balloons.bat   # Windows
+```
+
+Also you can just launch it manually:
 
 ```bash
 java -jar balloons.jar -c path/to/config
@@ -16,16 +38,14 @@ java -jar balloons.jar -c path/to/config
 
 You can customize a few options:
 
-* All customization supported by [Overlay](https://github.com/icpc/live-v3) are supported!
-  You likely want to [set problem colors](https://github.com/icpc/live-v3/blob/main/docs/advanced.json.md#change-problem-info) and
-  add custom fields — it's `custom-fields.csv` file in config directory that contain columns `team_id,hall,place`.
-
 * By default, port is 8001, but you can set another one via `--port=1234`.
 
 * By default, registration is enabled (but you still need to approve everyone), you can block self-registration using `--disable-registration`.
 
+In Shell/Batch scripts those variables are changed inside the script.
+
 Then navigate in your browser to `http://{ip}:{port}/` (by default and from the same machine, http://localhost:8001/). If this service
-is exposed to the internet, it's strictly recommended to use some reverse proxy like nginx.
+is exposed to the internet, it's strictly recommended to use some reverse proxy like nginx. See [config example](release-archive/examples/nginx_site.conf).
 
 Don't forget to add admin user (see below).
 
@@ -36,26 +56,28 @@ Don't forget to add admin user (see below).
 
 ## CLI
 
+Replace `./balloons.sh` with `balloons.bat` or `java -jar balloons.jar -c path/to/config` depending on your setup.
+
 ```bash
 # Create a volunteer
-java -jar balloons.jar -c config volunteer create login password
+./balloons.sh volunteer create login password
 
 # Create an admin
-java -jar balloons.jar -c config volunteer create --admin login password
+./balloons.sh volunteer create --admin login password
 
 # Make the volunteer an admin
-java -jar balloons.jar -c config volunteer update login --make-admin
+./balloons.sh volunteer update login --make-admin
 
 # Change password
-java -jar balloons.jar -c config volunteer update login --new-password=password
+./balloons.sh volunteer update login --new-password=password
 
 # Database SQL shell
-java -jar balloons.jar -c config h2shell
+./balloons.sh h2shell
 ```
 
 > [!IMPORTANT]
-> When specifying flags, make sure that `-c` / `--config-directory` is set **before** command (`h2shell` / `volunteer`) and other options
-> (username, password) are set **after** command.
+> When specifying flags, make sure that `-c` / `--config-directory` is set **before** the command (`h2shell` / `volunteer`)
+> and other options (username, password) are set **after** the command.
 
 ## Development
 
@@ -79,6 +101,12 @@ This task should do the trick.
 gradle shadowJar
 ```
 
+ZIP archive is generated using
+
+```bash
+gradle release
+```
+
 ### Translation Guide
 
 1. Add `frontend/src/i18n/<your-lang-code>.ts` file. Use the same structure as other localization files.
@@ -98,9 +126,5 @@ All of this wouldn't work without [ICPC Live tools](https://github.com/icpc/live
 
 ## TODO
 
-- [ ] Frontend: implement some pings to detect connectivity issues (??)
 - [ ] Store time of run and delivery and show it in interface
-- [ ] Show number of balloons remaining
 - [ ] Tests
-- [ ] Some docs on how to develop it
-- [ ] i18n
