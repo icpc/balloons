@@ -51,33 +51,12 @@ jobs:
       - name: Build and create release artifacts
         run: ./gradlew --no-daemon -Pnpm.download=false -Pballoons.embedFrontend=true shadowJar release
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          files: |
+            build/libs/balloons-${{ steps.version.outputs.version }}.jar
+            build/artifacts/balloons-${{ steps.version.outputs.version }}.zip
 
-      - name: Upload JAR artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/libs/balloons-${{ steps.version.outputs.version }}.jar
-          asset_name: balloons-${{ steps.version.outputs.version }}.jar
-          asset_content_type: application/java-archive
-
-      - name: Upload ZIP artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/artifacts/balloons-${{ steps.version.outputs.version }}.zip
-          asset_name: balloons-${{ steps.version.outputs.version }}.zip
-          asset_content_type: application/zip
+permissions:
+  contents: write
