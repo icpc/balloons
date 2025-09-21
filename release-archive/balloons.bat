@@ -4,8 +4,10 @@ REM Usage:
 REM   start: balloons.bat
 REM   commands:
 REM     balloons.bat volunteer create [--admin] login password
-REM     balloons.bat volunteer update login --make-admin
+REM     balloons.bat volunteer update login --manage=true
 REM     balloons.bat volunteer update login --new-password=password
+REM     balloons.bat volunteer delete login
+REM     balloons.bat reset-contest
 REM     balloons.bat h2shell
 
 SET PORT=8081

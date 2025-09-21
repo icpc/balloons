@@ -6,6 +6,8 @@
 #     ./balloons.sh volunteer create [--admin] login password
 #     ./balloons.sh volunteer update login --manage=true
 #     ./balloons.sh volunteer update login --new-password=password
+#     ./balloons.sh volunteer delete login
+#     ./balloons.sh reset-contest
 #     ./balloons.sh h2shell
 
 PORT=8081

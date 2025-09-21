@@ -41,6 +41,7 @@ import org.icpclive.balloons.event.EventStream
 import org.icpclive.balloons.event.contestController
 import org.icpclive.balloons.event.launchCDSFetcher
 import org.icpclive.balloons.tools.H2Shell
+import org.icpclive.balloons.tools.ResetContest
 import org.icpclive.balloons.tools.Volunteer
 import org.icpclive.cds.cli.CdsCommandLineOptions
 
@@ -52,7 +53,7 @@ object Application : CliktCommand("balloons") {
     private val balloonSettings by BalloonOptions()
 
     init {
-        subcommands(H2Shell, Volunteer)
+        subcommands(H2Shell, Volunteer, ResetContest)
     }
 
     private val databaseConfig by findOrSetObject("databaseConfig") {
@@ -62,6 +63,7 @@ object Application : CliktCommand("balloons") {
     override fun run() {
         val (balloonRepository, secretKeyRepository, volunteerRepository) = databaseModule(databaseConfig)
         currentContext.findOrSetObject("volunteerRepository") { volunteerRepository }
+        currentContext.findOrSetObject("balloonRepository") { balloonRepository }
 
         if (currentContext.invokedSubcommand != null) {
             // Don't run app for subcommands

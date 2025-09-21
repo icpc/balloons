@@ -74,6 +74,9 @@ Replace `./balloons.sh` with `balloons.bat` or `java -jar balloons.jar -c path/t
 # Delete volunteer (only if they did not take any balloons)
 ./balloons.sh volunteer delete login
 
+# Drop all balloons: useful between practice and main contest. All users remain.
+./balloons.sh reset-contest
+
 # Database SQL shell
 ./balloons.sh h2shell
 ```

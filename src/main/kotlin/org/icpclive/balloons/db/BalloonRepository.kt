@@ -77,4 +77,8 @@ class BalloonRepository(
                 BALLOON.VOLUNTEER_ID.eq(volunteerId),
             )
             .awaitSingle() > 0
+
+    suspend fun truncate() {
+        jooq.truncateTable(BALLOON).awaitSingle()
+    }
 }
