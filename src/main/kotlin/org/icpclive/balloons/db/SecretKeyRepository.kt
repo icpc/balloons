@@ -4,7 +4,9 @@ import org.icpclive.balloons.db.tables.references.SECRET_KEY
 import org.jooq.DSLContext
 import java.security.SecureRandom
 
-class SecretKeyRepository(private val jooq: DSLContext) {
+class SecretKeyRepository(
+    private val jooq: DSLContext,
+) {
     val secretKey by lazy { jooq.fetchOne(SECRET_KEY)?.data ?: storeKey() }
 
     private fun storeKey(): ByteArray {

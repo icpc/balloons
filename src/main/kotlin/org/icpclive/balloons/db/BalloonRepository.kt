@@ -8,7 +8,9 @@ import org.icpclive.balloons.event.Balloon
 import org.jooq.DSLContext
 import org.jooq.Record
 
-class BalloonRepository(private val jooq: DSLContext) {
+class BalloonRepository(
+    private val jooq: DSLContext,
+) {
     /**
      * @return record containing delivery status (`BALLOON.DELIVERED`) and responsible volunteer login (`VOLUNTEER.LOGIN`)
      */

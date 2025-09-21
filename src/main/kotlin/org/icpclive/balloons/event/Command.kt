@@ -12,12 +12,18 @@ sealed class BalloonCommand : Command {
 
 @Serializable
 @SerialName("takeBalloon")
-data class TakeBalloon(override val runId: String) : BalloonCommand()
+data class TakeBalloon(
+    override val runId: String,
+) : BalloonCommand()
 
 @Serializable
 @SerialName("dropBalloon")
-data class DropBalloon(override val runId: String) : BalloonCommand()
+data class DropBalloon(
+    override val runId: String,
+) : BalloonCommand()
 
 @Serializable
 @SerialName("deliverBalloon")
-data class DeliverBalloon(override val runId: String) : BalloonCommand()
+data class DeliverBalloon(
+    override val runId: String,
+) : BalloonCommand()

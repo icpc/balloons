@@ -50,5 +50,6 @@ jooq = ["jooq-kotlin", "jooq-kotlin-coroutines"]
 jooq = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinter = { id = "org.jmailen.kotlinter", version = "5.2.0" }
 node = { id = "com.github.node-gradle.node", version = "7.1.0" }
 shadow = { id = "com.gradleup.shadow", version = "8.3.5" }

@@ -10,7 +10,9 @@ import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.response.respond
 import org.icpclive.balloons.db.VolunteerRepository
 
-class CredentialValidator(private val volunteerRepository: VolunteerRepository) {
+class CredentialValidator(
+    private val volunteerRepository: VolunteerRepository,
+) {
     fun validate(credential: JWTCredential): VolunteerPrincipal? =
         credential.payload.let {
             val volunteerId = it.subject?.toLongOrNull() ?: return@let null

@@ -66,10 +66,13 @@ Replace `./balloons.sh` with `balloons.bat` or `java -jar balloons.jar -c path/t
 ./balloons.sh volunteer create --admin login password
 
 # Make the volunteer an admin
-./balloons.sh volunteer update login --make-admin
+./balloons.sh volunteer update login --manage=true
 
 # Change password
 ./balloons.sh volunteer update login --new-password=password
+
+# Delete volunteer (only if they did not take any balloons)
+./balloons.sh volunteer delete login
 
 # Database SQL shell
 ./balloons.sh h2shell

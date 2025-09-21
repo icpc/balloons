@@ -16,19 +16,25 @@ data object Reload : Event {
 
 @Serializable
 @SerialName("contestUpdated")
-data class ContestUpdated(val contest: Contest) : Event {
+data class ContestUpdated(
+    val contest: Contest,
+) : Event {
     override fun applyTo(state: State) = state.copy(contest = contest)
 }
 
 @Serializable
 @SerialName("balloonUpdated")
-data class BalloonUpdated(val balloon: Balloon) : Event {
+data class BalloonUpdated(
+    val balloon: Balloon,
+) : Event {
     override fun applyTo(state: State) =
         state.copy(balloons = state.balloons.filter { it.runId != balloon.runId }.plus(balloon).sortedBy { it.time })
 }
 
 @Serializable
 @SerialName("balloonDeleted")
-data class BalloonDeleted(val runId: String) : Event {
+data class BalloonDeleted(
+    val runId: String,
+) : Event {
     override fun applyTo(state: State) = state.copy(balloons = state.balloons.filter { it.runId != runId })
 }

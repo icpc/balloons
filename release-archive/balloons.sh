@@ -4,7 +4,7 @@
 #   start: balloons.sh
 #   commands:
 #     ./balloons.sh volunteer create [--admin] login password
-#     ./balloons.sh volunteer update login --make-admin
+#     ./balloons.sh volunteer update login --manage=true
 #     ./balloons.sh volunteer update login --new-password=password
 #     ./balloons.sh h2shell
 

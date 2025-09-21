@@ -1,6 +1,7 @@
 package org.icpclive.balloons.db
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.icpclive.balloons.db.tables.records.VolunteerRecord
@@ -11,14 +12,23 @@ import org.jooq.impl.DSL
 
 private const val BCRYPT_COST = 12
 
-class VolunteerRepository(private val jooq: DSLContext) {
+class VolunteerRepository(
+    private val jooq: DSLContext,
+) {
     private val bcryptHasher: BCrypt.Hasher = BCrypt.withDefaults()
 
     fun getById(id: Long) = jooq.fetchOne(VOLUNTEER, VOLUNTEER.ID.eq(id))
 
     fun getByLogin(login: String) = jooq.fetchOne(VOLUNTEER, VOLUNTEER.LOGIN.eq(login))
 
-    fun all(): List<VolunteerRecord> = jooq.selectFrom(VOLUNTEER).orderBy(VOLUNTEER.ID).fetchInto(VolunteerRecord::class.java)
+    suspend fun all(): List<VolunteerRecord> =
+        jooq
+            .selectFrom(VOLUNTEER)
+            .orderBy(VOLUNTEER.ID)
+            .fetchAsync()
+            .await()
+    // .collectList()
+    // .fetchInto(VolunteerRecord::class.java)
 
     /**
      * @return registered [VolunteerRecord] on success, `null` on failure
@@ -67,6 +77,10 @@ class VolunteerRepository(private val jooq: DSLContext) {
         canManage?.let { query.set(VOLUNTEER.CAN_MANAGE, it) }
 
         (query as UpdateSetMoreStep<*>).where(VOLUNTEER.ID.eq(id)).awaitSingle()
+    }
+
+    suspend fun delete(id: Long) {
+        jooq.deleteFrom(VOLUNTEER).where(VOLUNTEER.ID.eq(id)).awaitSingle()
     }
 
     private fun getHash(password: String): String = bcryptHasher.hashToString(BCRYPT_COST, password.toCharArray())

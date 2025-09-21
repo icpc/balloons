@@ -11,7 +11,9 @@ import org.icpclive.cds.api.RunInfo
 import org.icpclive.cds.api.RunResult
 import org.icpclive.cds.util.getLogger
 
-class EventStream(private val balloonRepository: BalloonRepository) {
+class EventStream(
+    private val balloonRepository: BalloonRepository,
+) {
     private val runs = MutableStateFlow(listOf<Run>())
 
     private val sink = MutableStateFlow<Pair<State, Event>>(State(Contest("Loading", listOf(), listOf()), listOf()) to Reload)
