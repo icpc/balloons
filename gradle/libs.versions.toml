@@ -3,7 +3,7 @@ jooq = "3.20.7"
 h2 = "2.3.232"
 kotlin = "2.2.20"
 ktor = "3.3.0"
-live = "e1ce1f946c080209df8040d44b014f921fdeffe8"
+live = "0ffcc861fbbdb707f25cb33875652786e1ad88af"
 logback = "1.5.18"
 
 [libraries]
