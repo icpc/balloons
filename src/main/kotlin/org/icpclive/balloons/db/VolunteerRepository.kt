@@ -17,9 +17,15 @@ class VolunteerRepository(
 ) {
     private val bcryptHasher: BCrypt.Hasher = BCrypt.withDefaults()
 
-    fun getById(id: Long) = jooq.fetchOne(VOLUNTEER, VOLUNTEER.ID.eq(id))
+    suspend fun getById(id: Long) =
+        jooq.selectFrom(VOLUNTEER)
+            .where(VOLUNTEER.ID.eq(id))
+            .awaitFirstOrNull()
 
-    fun getByLogin(login: String) = jooq.fetchOne(VOLUNTEER, VOLUNTEER.LOGIN.eq(login))
+    suspend fun getByLogin(login: String) =
+        jooq.selectFrom(VOLUNTEER)
+            .where(VOLUNTEER.LOGIN.eq(login))
+            .awaitFirstOrNull()
 
     suspend fun all(): List<VolunteerRecord> =
         jooq
@@ -27,8 +33,6 @@ class VolunteerRepository(
             .orderBy(VOLUNTEER.ID)
             .fetchAsync()
             .await()
-    // .collectList()
-    // .fetchInto(VolunteerRecord::class.java)
 
     /**
      * @return registered [VolunteerRecord] on success, `null` on failure

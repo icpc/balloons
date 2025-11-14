@@ -33,9 +33,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Lint
-        run: ./gradlew --no-daemon -Pnpm.download=false lintKotlin
-
       - name: Build
         run: ./gradlew --no-daemon -Pnpm.download=false shadowJar
 
@@ -45,3 +42,6 @@ jobs:
           path: build/libs/balloons-*.jar
           retention-days: 14
           compression-level: 0
+
+      - name: Lint
+        run: ./gradlew --no-daemon -Pnpm.download=false lintKotlin

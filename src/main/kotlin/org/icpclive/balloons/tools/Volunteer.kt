@@ -39,7 +39,7 @@ object CreateVolunteer : CliktCommand("create") {
             if (volunteerRepository.register(login, password, canAccess = true, canManage = admin) != null) {
                 logger.info { "Volunteer $login created" }
             } else {
-                logger.error { "Volunteer not created: probably it already exists." }
+                logger.error { "Volunteer not created: probably login is occupied." }
                 exitProcess(1)
             }
         }
@@ -61,14 +61,14 @@ object UpdateVolunteer : CliktCommand("update") {
             exitProcess(1)
         }
 
-        val volunteer = volunteerRepository.getByLogin(login)
-
-        if (volunteer == null) {
-            logger.error { "Volunteer not found" }
-            exitProcess(1)
-        }
-
         runBlocking {
+            val volunteer = volunteerRepository.getByLogin(login)
+
+            if (volunteer == null) {
+                logger.error { "Volunteer not found" }
+                exitProcess(1)
+            }
+
             newPassword?.let {
                 volunteerRepository.setPassword(volunteer.id!!, it)
                 logger.info { "Password for volunteer $login updated" }
@@ -88,15 +88,15 @@ object DeleteVolunteer : CliktCommand("delete") {
 
     private val volunteerRepository: VolunteerRepository by requireObject("volunteerRepository")
 
-    override fun run() {
-        val volunteer = volunteerRepository.getByLogin(login)
-
-        if (volunteer == null) {
-            logger.error { "Volunteer not found" }
-            exitProcess(1)
-        }
-
+    override fun run() =
         runBlocking {
+            val volunteer = volunteerRepository.getByLogin(login)
+
+            if (volunteer == null) {
+                logger.error { "Volunteer not found" }
+                exitProcess(1)
+            }
+
             try {
                 volunteerRepository.delete(volunteer.id!!)
                 logger.info { "Volunteer $login deleted" }
@@ -105,7 +105,6 @@ object DeleteVolunteer : CliktCommand("delete") {
                 exitProcess(1)
             }
         }
-    }
 }
 
 private val logger by getLogger()

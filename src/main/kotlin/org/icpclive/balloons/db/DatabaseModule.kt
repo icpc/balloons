@@ -1,7 +1,8 @@
 package org.icpclive.balloons.db
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.newFixedThreadPoolContext
 import org.jooq.ExecutorProvider
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -13,12 +14,13 @@ data class DatabaseModule(
     val volunteerRepository: VolunteerRepository,
 )
 
+@OptIn(DelicateCoroutinesApi::class)
 fun databaseModule(databaseConfig: DatabaseConfig): DatabaseModule {
     val dbConnection = databaseConfig.createConnection()
     val jooq =
         DSL.using(
             DefaultConfiguration()
-                .set(ExecutorProvider { Dispatchers.IO.asExecutor() })
+                .set(ExecutorProvider { newFixedThreadPoolContext(16, "jooq").asExecutor() })
                 .set(dbConnection)
                 .set(SQLDialect.H2),
         )

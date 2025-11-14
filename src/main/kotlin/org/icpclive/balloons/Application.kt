@@ -17,6 +17,7 @@ import io.ktor.server.http.content.react
 import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.compression.condition
 import io.ktor.server.plugins.compression.deflate
@@ -85,6 +86,7 @@ object Application : CliktCommand("balloons") {
                 runningLimit = parallelism * 16
             },
         ) {
+            install(CallLogging)
             install(Compression) {
                 gzip {
                     condition {

@@ -13,7 +13,7 @@ import org.icpclive.balloons.db.VolunteerRepository
 class CredentialValidator(
     private val volunteerRepository: VolunteerRepository,
 ) {
-    fun validate(credential: JWTCredential): VolunteerPrincipal? =
+    suspend fun validate(credential: JWTCredential): VolunteerPrincipal? =
         credential.payload.let {
             val volunteerId = it.subject?.toLongOrNull() ?: return@let null
             val volunteer = volunteerRepository.getById(volunteerId) ?: return@let null

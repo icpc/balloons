@@ -36,6 +36,7 @@ fun Route.authController(
         JWT.create()
             .withSubject(volunteerId.toString())
             .withExpiresAt(Clock.System.now().plus(365.days).toJavaInstant())
+            // Should be already fetched here, so no sync IO
             .sign(Algorithm.HMAC256(secretKeyRepository.secretKey))
     }
 
