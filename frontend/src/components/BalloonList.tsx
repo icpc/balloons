@@ -3,21 +3,28 @@ import { Balloon, Contest, Problem, Team } from '../types';
 import ProblemBox from './ProblemBox';
 import { useContestMaps } from '../hooks/useContestMaps';
 
+const defaultProblem = (problemId: string): Problem => ({
+  id: problemId,
+  alias: problemId,
+  name: problemId,
+  color: null,
+});
+
 const BalloonRow = ({ balloon, problem, team, actions }: {
   balloon: Balloon
-  problem: Problem
-  team: Team
+  problem?: Problem
+  team?: Team
   actions: (balloon: Balloon) => React.ReactNode
 }) => {
   const actionContent = actions(balloon);
 
   const content = useMemo(() => (
     <div className="balloon-row">
-      <ProblemBox problem={problem} />
+      <ProblemBox problem={problem ?? defaultProblem(balloon.problemId)} />
       {balloon.isFTS ? <span className="fts">★</span> : <span></span>}
-      <span className="team-place">{team.displayName}</span>
+      <span className="team-place">{team?.displayName ?? balloon.teamId}</span>
       <div className="actions">{actionContent}</div>
-      <span className="team-name">{team.fullName}</span>
+      <span className="team-name">{team?.fullName ?? balloon.teamId}</span>
     </div>
   ), [balloon, problem, team, actionContent]);
 
