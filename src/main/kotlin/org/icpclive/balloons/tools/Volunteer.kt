@@ -19,10 +19,21 @@ object Volunteer : CliktCommand("volunteer") {
     override fun help(context: Context) = "Manage volunteers"
 
     init {
-        subcommands(CreateVolunteer, UpdateVolunteer, DeleteVolunteer)
+        subcommands(ListVolunteers, CreateVolunteer, UpdateVolunteer, DeleteVolunteer)
     }
 
     override fun run() {}
+}
+
+object ListVolunteers : CliktCommand("list") {
+    private val volunteerRepository: VolunteerRepository by requireObject("volunteerRepository")
+
+    override fun run() =
+        runBlocking {
+            volunteerRepository.all().forEach {
+                println("${it.login} [access: ${it.canAccess}, manage: ${it.canManage}]")
+            }
+        }
 }
 
 object CreateVolunteer : CliktCommand("create") {
@@ -50,7 +61,7 @@ object UpdateVolunteer : CliktCommand("update") {
     override val printHelpOnEmptyArgs = true
 
     private val login by argument()
-    private val manage by option().boolean().help("Update management privileges")
+    private val manage by option().boolean().help("Update management permission")
     private val newPassword by option().help("Set new password")
 
     private val volunteerRepository: VolunteerRepository by requireObject("volunteerRepository")
