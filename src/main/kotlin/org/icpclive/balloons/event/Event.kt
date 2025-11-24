@@ -27,8 +27,7 @@ data class ContestUpdated(
 data class BalloonUpdated(
     val balloon: Balloon,
 ) : Event {
-    override fun applyTo(state: State) =
-        state.copy(balloons = state.balloons.filter { it.runId != balloon.runId }.plus(balloon).sortedBy { it.time })
+    override fun applyTo(state: State) = state.copy(balloons = state.balloons.plus(balloon.runId to balloon))
 }
 
 @Serializable
@@ -36,5 +35,5 @@ data class BalloonUpdated(
 data class BalloonDeleted(
     val runId: String,
 ) : Event {
-    override fun applyTo(state: State) = state.copy(balloons = state.balloons.filter { it.runId != runId })
+    override fun applyTo(state: State) = state.copy(balloons = state.balloons.minus(runId))
 }

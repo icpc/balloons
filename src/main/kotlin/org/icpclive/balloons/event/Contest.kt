@@ -11,7 +11,7 @@ data class Contest(
 ) {
     constructor(contestInfo: ContestInfo) : this(
         name = contestInfo.name,
-        teams = contestInfo.teams.values.map(::Team).sortedBy { it.displayName },
+        teams = contestInfo.teams.values.filter { !it.isHidden }.map(::Team).sortedBy { it.displayName },
         problems = contestInfo.problems.map { (_, value) -> Problem(value) }.sortedBy { it.alias },
     )
 }

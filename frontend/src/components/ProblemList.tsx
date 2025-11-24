@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Problem, State } from '../types';
+import { Balloon, Contest, Problem } from '../types';
 import ProblemBox from './ProblemBox';
 
 const ProblemBlock = ({ problem, solves }: { problem: Problem, solves: number }) => {
@@ -13,7 +13,7 @@ const ProblemBlock = ({ problem, solves }: { problem: Problem, solves: number })
   ), [problem, solves]);
 };
 
-const ProblemList = ({ contest, balloons }: State) => {
+const ProblemList = ({ contest, balloons }: { contest: Contest, balloons: Balloon[] }) => {
   return useMemo(() => (
     <div className="problem-list">
       {contest.problems.map(problem => (

@@ -53,7 +53,7 @@ export interface Contest {
 
 export interface State {
   contest: Contest
-  balloons: Balloon[]
+  balloons: Record<string, Balloon>
 }
 
 export type Event =

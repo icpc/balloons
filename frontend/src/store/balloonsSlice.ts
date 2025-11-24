@@ -14,18 +14,22 @@ export const balloonsSlice = createSlice({
   initialState,
   reducers: {
     updateBalloon: (state, action: PayloadAction<Balloon>) => {
-      const index = state.items.findIndex(b => b.runId === action.payload.runId);
-      if (index >= 0) {
-        state.items[index] = action.payload;
+      const balloons = state.items.filter(b => b.runId !== action.payload.runId);
+
+      const insertIndex = balloons.findIndex(b => b.time > action.payload.time);
+      if (insertIndex === -1) {
+        balloons.push(action.payload);
       } else {
-        state.items.push(action.payload);
+        balloons.splice(insertIndex, 0, action.payload);
       }
+
+      state.items = balloons;
     },
     deleteBalloon: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter(b => b.runId !== action.payload);
     },
-    setBalloons: (state, action: PayloadAction<Balloon[]>) => {
-      state.items = action.payload;
+    setBalloons: (state, action: PayloadAction<Record<string, Balloon>>) => {
+      state.items = Object.values(action.payload).sort((a, b) => a.time - b.time);
     },
   },
 });

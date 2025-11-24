@@ -14,9 +14,7 @@ import org.icpclive.cds.util.getLogger
 class EventStream(
     private val balloonRepository: BalloonRepository,
 ) {
-    private val runs = MutableStateFlow(listOf<Run>())
-
-    private val sink = MutableStateFlow<Pair<State, Event>>(State(Contest("Loading", listOf(), listOf()), listOf()) to Reload)
+    private val sink = MutableStateFlow<Pair<State, Event>>(State(Contest("Loading", listOf(), listOf()), mapOf()) to Reload)
     val stream = sink.asStateFlow()
 
     /**
@@ -35,7 +33,7 @@ class EventStream(
         volunteerId: Long,
     ): Boolean {
         val balloon =
-            getState().balloons.find { it.runId == command.runId }
+            getState().balloons[command.runId]
                 ?: return false
 
         when (command) {
@@ -79,79 +77,32 @@ class EventStream(
     // This can be written in non-concurrent fashion.
     suspend fun processRun(runInfo: RunInfo) {
         val runId = runInfo.id.value
+        val isBalloon = !runInfo.isHidden && runInfo.result.isSolved() && !(runInfo.result as RunResult.ICPC).isAfterFirstOk
 
-        val existingRun = runs.value.find { it.runId == runId }
-        val run = Run(runInfo)
+        val existingBalloon = getState().balloons[runId]
 
-        if (runInfo.result.isSolved()) {
-            if (existingRun == run) {
-                return
-            }
+        if (isBalloon) {
+            val balloon =
+                Balloon(
+                    runId = runId,
+                    isFTS = (runInfo.result as RunResult.ICPC).isFirstToSolveRun,
+                    teamId = runInfo.teamId.value,
+                    problemId = runInfo.problemId.value,
+                    time = runInfo.time,
+                ).withDelivery()
 
-            runs.update { runs ->
-                runs.filter { it.runId != runId }.plus(Run(runInfo)).sorted()
-            }
-        } else {
-            if (existingRun == null) {
-                return
-            }
-
-            // Extremely rare case: the run was OK and then rejudged. In that case, we should remove this run from our list.
-            logger.warning { "Removing existing OK for ${Run(runInfo)}" }
-
-            runs.update { runs ->
-                runs.filter { it.runId != runId }
-            }
-        }
-
-        synchronizeProblemState(run.problemId, run.teamId)
-    }
-
-    /**
-     * Recalculates current state by [runs] and commits it to [sink].
-     */
-    private suspend fun synchronizeProblemState(
-        problemId: String,
-        teamId: String,
-    ) {
-        val existingBalloon = getState().balloons.find { it.problemId == problemId && it.teamId == teamId }
-        val existingFTS = getState().balloons.find { it.problemId == problemId && it.isFTS }
-
-        val actualRun = runs.value.find { it.problemId == problemId && it.teamId == teamId }
-        val actualFTS = runs.value.find { it.problemId == problemId }
-
-        if (existingBalloon != null && existingBalloon.runId != actualRun?.runId) {
-            // Existing balloon does not correspond to OK run for this team, so remove it.
-            updateSink(BalloonDeleted(existingBalloon.runId))
-        }
-
-        if (actualRun != null) {
-            val targetBalloon = actualRun.toBalloon(isFTS = actualRun.runId == actualFTS?.runId)
-
-            if (existingBalloon != targetBalloon) {
-                updateSink(BalloonUpdated(targetBalloon))
-            }
-        }
-
-        if (existingFTS?.runId != actualFTS?.runId) {
-            if (existingFTS != null) {
-                // Drop FTS for old run
-                val balloon = getState().balloons.find { it.runId == existingFTS.runId }
-                if (balloon != null && balloon.isFTS) {
-                    updateSink(BalloonUpdated(balloon.copy(isFTS = false)))
+            if (existingBalloon != balloon) {
+                // New or updated run, push it.
+                if (existingBalloon != null) {
+                    logger.info { "Balloon for submission $runId is updated: was ${existingBalloon.isFTS}, now ${balloon.isFTS}" }
                 }
-            }
 
-            if (actualFTS != null) {
-                // Add FTS for new run
-                val balloon =
-                    getState().balloons.find { it.runId == actualFTS.runId }
-                        ?: throw IllegalStateException("No balloon for FTS run $actualFTS found")
-
-                if (!balloon.isFTS) {
-                    updateSink(BalloonUpdated(balloon.copy(isFTS = true)))
-                }
+                updateSink(BalloonUpdated(balloon))
             }
+        } else if (existingBalloon != null) {
+            // Extremely rare: possibly rejudge from OK to WA. We're removing a balloon.
+            logger.info { "Balloon for submission $runId is recalled" }
+            updateSink(BalloonDeleted(runId))
         }
     }
 
@@ -174,10 +125,6 @@ class EventStream(
             is RunResult.IOI -> false
             is RunResult.InProgress -> false
         }
-
-    private suspend fun Run.toBalloon(isFTS: Boolean) =
-        Balloon(runId, isFTS, teamId, problemId, time)
-            .withDelivery()
 
     private suspend fun Balloon.withDelivery(): Balloon {
         val delivery = balloonRepository.getDelivery(this)

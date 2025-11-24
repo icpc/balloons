@@ -13,7 +13,6 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.icpclive.balloons.BalloonOptions
 import org.icpclive.balloons.Language
@@ -59,11 +58,11 @@ fun Route.contestController(
         val principal =
             try {
                 webSocketAuthenticator.authenticate(this)
-            } catch (exc: ClosedReceiveChannelException) {
+            } catch (_: ClosedReceiveChannelException) {
                 return@webSocket
             }
 
-        if (principal?.volunteer?.canAccess != true) {
+        if (principal == null) {
             send("""{"error": "access denied"}""")
             return@webSocket
         }
@@ -93,7 +92,7 @@ fun Route.contestController(
                     send("""{"error": "command failed"}""")
                 }
             }
-        } catch (ignored: ClosedReceiveChannelException) {
+        } catch (_: ClosedReceiveChannelException) {
         } catch (exc: Exception) {
             logger.warning { "WebSocket exception: ${exc.localizedMessage}" }
             throw exc

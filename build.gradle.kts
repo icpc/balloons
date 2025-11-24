@@ -32,8 +32,6 @@ repositories {
 dependencies {
     jooqCodegen(libs.h2)
 
-    compileOnly(libs.live.schemas)
-
     implementation(libs.bundles.ktor)
     implementation(libs.logback)
     implementation(libs.live.cds)
@@ -185,9 +183,9 @@ tasks {
             }
         }
 
-        val schemasJar = configurations.compileClasspath.get().find { it.name.contains("org.icpclive.cds.schemas") }
-        if (schemasJar != null) {
-            from(zipTree(schemasJar)) {
+        val cdsJar = configurations.compileClasspath.get().find { it.name.contains("org.icpclive.cds.full") }
+        if (cdsJar != null) {
+            from(zipTree(cdsJar)) {
                 include("schemas/*.schema.json")
                 into(".vscode")
             }

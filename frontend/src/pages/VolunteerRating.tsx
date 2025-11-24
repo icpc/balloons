@@ -16,7 +16,7 @@ const RatingView = () => {
   const balloons = useSelector((state: RootState) => state.balloons.items);
 
   const volunteerStats = useMemo(() => {
-    const deliveredBalloons = balloons.filter(b => b.delivered && b.takenBy);
+    const deliveredBalloons = balloons.filter(balloon => balloon.delivered && balloon.takenBy);
 
     const stats = new Map<string, number>();
     deliveredBalloons.forEach((balloon) => {

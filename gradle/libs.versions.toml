@@ -1,10 +1,10 @@
 [versions]
 jooq = "3.20.7"
-h2 = "2.3.232"
-kotlin = "2.2.20"
-ktor = "3.3.0"
-live = "0ffcc861fbbdb707f25cb33875652786e1ad88af"
-logback = "1.5.18"
+h2 = "2.4.240"
+kotlin = "2.2.21"
+ktor = "3.3.2"
+live = "145003664de9ee72975ff21d7c7866d5cd6148f7"
+logback = "1.5.21"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
@@ -25,7 +25,6 @@ bcrypt = { module = "at.favre.lib:bcrypt", version = "0.10.2" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 live-cds = { module = "com.github.icpc.live-v3:org.icpclive.cds.full", version.ref = "live" }
-live-schemas = { module = "com.github.icpc.live-v3:org.icpclive.cds.schemas", version.ref = "live" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }

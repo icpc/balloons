@@ -25,7 +25,7 @@ class WebSocketAuthenticator(
             val decoded =
                 try {
                     jwtVerifier.verify(frame.readText())
-                } catch (exc: JWTVerificationException) {
+                } catch (_: JWTVerificationException) {
                     return null
                 }
 
