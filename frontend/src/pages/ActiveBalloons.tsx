@@ -9,16 +9,25 @@ import { RootState } from '../store/store';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 import { useTranslation } from 'react-i18next';
+import { useContestMaps } from '../hooks/useContestMaps';
+import { Balloon, Team } from '../types';
+
+function teamId(balloon: Balloon, teamMap: Record<string, Team>): string {
+  return teamMap[balloon.teamId]?.displayName ?? balloon.teamId;
+}
 
 const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
   const { t } = useTranslation();
   const ws = useWebSocket();
   const contest = useSelector((state: RootState) => state.contest);
   const filteredBalloons = useFilteredBalloons();
+  const { teamMap } = useContestMaps(contest);
 
   const myBalloons = useMemo(() => {
-    return filteredBalloons.filter(balloon => balloon.takenBy === infoHolder.info.login && !balloon.delivered);
-  }, [filteredBalloons, infoHolder.info.login]);
+    return filteredBalloons
+      .filter(balloon => balloon.takenBy === infoHolder.info.login && !balloon.delivered)
+      .sort((a, b) => teamId(a, teamMap).localeCompare(teamId(b, teamMap)));
+  }, [filteredBalloons, infoHolder.info.login, teamMap]);
 
   const queuedBalloons = useMemo(() => {
     return filteredBalloons.filter(balloon => balloon.takenBy === null && !balloon.delivered);
