@@ -37,10 +37,9 @@ import org.icpclive.balloons.auth.authController
 import org.icpclive.balloons.auth.installJwt
 import org.icpclive.balloons.db.DatabaseConfig
 import org.icpclive.balloons.db.databaseModule
-import org.icpclive.balloons.event.CDSFetcher
 import org.icpclive.balloons.event.EventStream
 import org.icpclive.balloons.event.contestController
-import org.icpclive.balloons.event.launchCDSFetcher
+import org.icpclive.balloons.event.launchCDS
 import org.icpclive.balloons.tools.H2Shell
 import org.icpclive.balloons.tools.ResetContest
 import org.icpclive.balloons.tools.Volunteer
@@ -75,8 +74,7 @@ object Application : CliktCommand("balloons") {
         val jwtVerifier = JWT.require(Algorithm.HMAC256(secretKeyRepository.secretKey)).build()
         val credentialValidator = CredentialValidator(volunteerRepository)
         val webSocketAuthenticator = WebSocketAuthenticator(jwtVerifier, credentialValidator)
-        val eventStream = EventStream(balloonRepository)
-        val cdsFetcher = CDSFetcher(eventStream, cdsSettings)
+        val eventStream = EventStream(balloonRepository, cdsSettings)
 
         embeddedServer(
             Netty,
@@ -113,7 +111,7 @@ object Application : CliktCommand("balloons") {
 
             installJwt(jwtVerifier, credentialValidator)
 
-            launchCDSFetcher(cdsFetcher)
+            launchCDS(eventStream)
 
             routing {
                 adminController(volunteerRepository)
