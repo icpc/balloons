@@ -11,7 +11,6 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.icpclive.balloons.BalloonOptions
@@ -68,17 +67,16 @@ fun Route.contestController(
         }
 
         val outgoingStream =
-            launch {
-                var expectState = true
-
-                eventStream.stream.collect { (state, event) ->
-                    if (expectState || event == Reload) {
-                        expectState = false
-                        send(jsonSerializer.encodeToString(state))
-                    } else {
-                        send(jsonSerializer.encodeToString(event))
+            eventStream.subscribe(this) { message ->
+                // TODO: serialize whole message
+                val frameContent =
+                    when {
+                        message.state != null -> jsonSerializer.encodeToString(message.state)
+                        message.event != null -> jsonSerializer.encodeToString(message.event)
+                        else -> throw IllegalArgumentException("invalid event: $message")
                     }
-                }
+
+                send(frameContent)
             }
 
         try {
