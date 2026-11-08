@@ -56,14 +56,14 @@ export interface State {
   balloons: Record<string, Balloon>
 }
 
-export type Event =
-  | { type: 'contestUpdated', contest: Contest }
-  | { type: 'balloonUpdated', balloon: Balloon }
-  | { type: 'balloonDeleted', runId: string };
+export type Event
+  = | { type: 'contestUpdated', contest: Contest }
+    | { type: 'balloonUpdated', balloon: Balloon }
+    | { type: 'balloonDeleted', runId: string };
 
 export type WebSocketMessage = Event | State;
 
-export type Command =
-  | { type: 'takeBalloon', runId: string }
-  | { type: 'dropBalloon', runId: string }
-  | { type: 'deliverBalloon', runId: string };
+export type Command
+  = | { type: 'takeBalloon', runId: string }
+    | { type: 'dropBalloon', runId: string }
+    | { type: 'deliverBalloon', runId: string };

@@ -50,7 +50,7 @@ const Register = ({ infoHolder }: { infoHolder: InfoHolder }) => {
       if (response.ok) {
         const data = await response.json() as { token: string };
         infoHolder.setToken(data.token);
-        navigate('/');
+        void navigate('/');
       }
     } catch (err) {
       console.error(err);

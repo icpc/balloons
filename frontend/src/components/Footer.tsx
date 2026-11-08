@@ -8,7 +8,7 @@ const Footer = ({ infoHolder }: { infoHolder: InfoHolder }) => {
 
   const handleLogout = () => {
     infoHolder.setToken(null);
-    navigate('/');
+    void navigate('/');
   };
 
   return (

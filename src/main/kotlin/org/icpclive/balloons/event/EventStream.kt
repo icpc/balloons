@@ -41,8 +41,14 @@ class EventStream(
     suspend fun consumeCds() {
         cds.buffer(capacity = UNLIMITED).collect { event ->
             when (event) {
-                is RunUpdate -> processRun(event.newInfo)
-                is InfoUpdate -> processContestInfo(event.newInfo)
+                is RunUpdate -> {
+                    processRun(event.newInfo)
+                }
+
+                is InfoUpdate -> {
+                    processContestInfo(event.newInfo)
+                }
+
                 else -> {}
             }
         }

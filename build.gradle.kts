@@ -35,7 +35,6 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.logback)
     implementation(libs.live.cds)
-    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.h2)
     implementation(libs.bundles.jooq)
@@ -84,6 +83,11 @@ tasks.compileKotlin {
     dependsOn(tasks.jooqCodegen)
 }
 
+tasks.withType<org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask> {
+    dependsOn(tasks.jooqCodegen)
+    exclude { it.file.path.contains("/build/jooq/") }
+}
+
 tasks.register<Exec>("downloadLive") {
     description = "Downloads ICPC Live repository"
     group = "release"
@@ -118,7 +122,13 @@ tasks {
         useJUnitPlatform()
     }
 
+    jar {
+        archiveClassifier = "plain"
+    }
+
     shadowJar {
+        // Shadow 9 defaults to EXCLUDE, which drops duplicate META-INF/services before merging
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
         mergeServiceFiles()
         archiveClassifier = null
     }

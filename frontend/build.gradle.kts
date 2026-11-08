@@ -5,8 +5,8 @@ plugins {
 }
 
 node {
-    version.set("20.18.0")
-    pnpmVersion.set("9.12.3")
+    version.set("24.22.2")
+    pnpmVersion.set("12.18.0")
     download.set(rootProject.findProperty("npm.download") == "true")
 }
 

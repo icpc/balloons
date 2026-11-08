@@ -30,7 +30,7 @@ function AppContent() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [info, setInfo] = useState<Info>({ status: 'loading', language: 'EN' });
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<number>();
+  const reconnectTimeoutRef = useRef<number | undefined>(undefined);
 
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
@@ -84,14 +84,12 @@ function AppContent() {
 
     websocket.onclose = () => {
       // Schedule reconnection
-      if (!reconnectTimeoutRef.current) {
-        reconnectTimeoutRef.current = window.setTimeout(() => {
-          reconnectTimeoutRef.current = undefined;
-          if (token && info.canAccess) {
-            setWs(createWebSocket());
-          }
-        }, RECONNECT_DELAY);
-      }
+      reconnectTimeoutRef.current ??= window.setTimeout(() => {
+        reconnectTimeoutRef.current = undefined;
+        if (token && info.canAccess) {
+          setWs(createWebSocket());
+        }
+      }, RECONNECT_DELAY);
     };
 
     websocket.onmessage = (event: MessageEvent<string>) => {

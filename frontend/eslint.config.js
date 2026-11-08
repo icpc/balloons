@@ -9,7 +9,7 @@ import stylistic from '@stylistic/eslint-plugin'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
-    settings: { react: { version: '18.3' } },
+    settings: { react: { version: '19.3' } },
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked, ...tseslint.configs.stylisticTypeChecked],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -30,11 +30,13 @@ export default tseslint.config(
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      // React Compiler rule; flags fetch-in-effect and external-system sync patterns used here
+      'react-hooks/set-state-in-effect': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-      ...stylistic.configs['recommended-flat'].rules,
+      ...stylistic.configs.recommended.rules,
       '@stylistic/semi': ['error', 'always'],
       '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
     },
