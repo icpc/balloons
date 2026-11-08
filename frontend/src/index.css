@@ -152,6 +152,47 @@ th {
   gap: 0.5em;
 }
 
+.problem-list .unsolved {
+  opacity: 0.5;
+}
+
+.problem-list :not(.unsolved) + .unsolved {
+  margin-left: 0.4em;
+}
+
+.problem-stats-labels .problem {
+  visibility: hidden;
+  width: 0;
+}
+
+.problem-stats-labels {
+  margin-left: 0.4em;
+  opacity: 0.5;
+}
+
+.problem-stats .pending-zero {
+  opacity: 0.5;
+}
+
+.problem-stats .pending-low {
+  background-color: #fcc;
+}
+
+.problem-stats .pending-mid {
+  background-color: #e55;
+  color: white;
+}
+
+.problem-stats .pending-high {
+  background-color: #900;
+  color: white;
+}
+
+.problem-stats-labels .problem-stats {
+  text-align: left;
+  white-space: nowrap;
+}
+
 .problem {
   font-size: 1.6em;
   width: 1.2em;
@@ -162,7 +203,7 @@ th {
   border: 1px solid black;
 }
 
-.problem-solves {
+.problem-stats {
   font-size: 0.9em;
   color: #777;
   text-align: center;

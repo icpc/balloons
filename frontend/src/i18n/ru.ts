@@ -52,6 +52,8 @@ export default {
     deliveredTitle: 'Доставленные шарики',
     delivered: 'Доставлены',
     deliveredBy: 'Доставлен ',
+    inQueue: 'в очереди',
+    total: 'всего',
   },
   errors: {
     noAccess: 'Нет доступа',

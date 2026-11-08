@@ -52,6 +52,8 @@ export default {
     deliveredTitle: 'Delivered Balloons',
     delivered: 'Delivered',
     deliveredBy: 'Delivered by ',
+    inQueue: 'in queue',
+    total: 'total',
   },
   errors: {
     noAccess: 'No access',
