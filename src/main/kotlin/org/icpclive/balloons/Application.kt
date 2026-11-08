@@ -23,12 +23,14 @@ import io.ktor.server.plugins.compression.condition
 import io.ktor.server.plugins.compression.deflate
 import io.ktor.server.plugins.compression.gzip
 import io.ktor.server.plugins.compression.identity
-import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.uri
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
+import io.ktor.server.websocket.pingPeriod
+import io.ktor.websocket.WebSocketDeflateExtension
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.icpclive.balloons.admin.adminController
 import org.icpclive.balloons.auth.CredentialValidator
@@ -39,11 +41,12 @@ import org.icpclive.balloons.db.DatabaseConfig
 import org.icpclive.balloons.db.databaseModule
 import org.icpclive.balloons.event.EventStream
 import org.icpclive.balloons.event.contestController
-import org.icpclive.balloons.event.launchCDS
 import org.icpclive.balloons.tools.H2Shell
 import org.icpclive.balloons.tools.ResetContest
 import org.icpclive.balloons.tools.Volunteer
 import org.icpclive.cds.cli.CdsCommandLineOptions
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 object Application : CliktCommand("balloons") {
     override val printHelpOnEmptyArgs = true
@@ -107,11 +110,16 @@ object Application : CliktCommand("balloons") {
                 )
             }
 
-            install(WebSockets)
+            install(WebSockets) {
+                pingPeriod = 15.seconds
+                extensions {
+                    install(WebSocketDeflateExtension)
+                }
+            }
 
             installJwt(jwtVerifier, credentialValidator)
 
-            launchCDS(eventStream)
+            launch { eventStream.consumeCds() }
 
             routing {
                 adminController(volunteerRepository)
@@ -119,10 +127,14 @@ object Application : CliktCommand("balloons") {
                 contestController(eventStream, webSocketAuthenticator, balloonSettings)
                 route("/") {
                     install(CachingHeaders) {
-                        options { _, _ -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30)) }
+                        options { call, _ ->
+                            if (call.request.uri.startsWith("/assets/")) {
+                                CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 365.days.inWholeSeconds.toInt()))
+                            } else {
+                                CachingOptions(CacheControl.NoCache(null))
+                            }
+                        }
                     }
-
-                    install(ConditionalHeaders)
 
                     singlePageApplication {
                         react("frontend")

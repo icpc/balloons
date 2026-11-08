@@ -22,7 +22,9 @@ import ConnectionStatus from './components/ConnectionStatus';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n/config';
 
-const RECONNECT_DELAY = 3000; // 3 seconds
+const RECONNECT_DELAY = 1000;
+const RECONNECT_JITTER = 4000;
+const COMMAND_ERROR_TTL = 3000;
 
 function AppContent() {
   const { t } = useTranslation();
@@ -30,7 +32,9 @@ function AppContent() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [info, setInfo] = useState<Info>({ status: 'loading', language: 'EN' });
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | undefined>(undefined);
+  const [commandErrors, setCommandErrors] = useState(0);
 
   const setTokenWithStorage = useCallback((newToken: string | null) => {
     if (newToken) {
@@ -87,15 +91,20 @@ function AppContent() {
       reconnectTimeoutRef.current ??= window.setTimeout(() => {
         reconnectTimeoutRef.current = undefined;
         if (token && info.canAccess) {
-          setWs(createWebSocket());
+          const next = createWebSocket();
+          wsRef.current = next;
+          setWs(next);
         }
-      }, RECONNECT_DELAY);
+      }, RECONNECT_DELAY + Math.random() * RECONNECT_JITTER);
     };
 
     websocket.onmessage = (event: MessageEvent<string>) => {
       const message = JSON.parse(event.data) as WebSocketMessage;
 
-      if ('type' in message) {
+      if ('error' in message) {
+        console.warn('Command rejected:', message.error);
+        setCommandErrors(n => n + 1);
+      } else if ('type' in message) {
         switch (message.type) {
           case 'contestUpdated':
             dispatch(setContest(message.contest));
@@ -120,26 +129,34 @@ function AppContent() {
 
   useEffect(() => {
     if (!token || !info.canAccess) {
-      if (ws) {
-        ws.close();
-        setWs(null);
-      }
       return;
     }
 
     const websocket = createWebSocket();
+    wsRef.current = websocket;
     setWs(websocket);
 
     return () => {
-      websocket.close();
+      const current = wsRef.current;
+      if (current) {
+        // Do not reconnect here.
+        current.onclose = null;
+        current.close();
+      }
+      wsRef.current = null;
       if (reconnectTimeoutRef.current) {
         window.clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = undefined;
       }
       setWs(null);
     };
-    // we shouldn't add ws here
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, info.canAccess, createWebSocket]);
+
+  useEffect(() => {
+    if (commandErrors === 0) return;
+    const id = window.setTimeout(() => setCommandErrors(0), COMMAND_ERROR_TTL);
+    return () => window.clearTimeout(id);
+  }, [commandErrors]);
 
   if (info.status === 'loading') {
     return (
@@ -155,6 +172,9 @@ function AppContent() {
   return (
     <WebSocketContext.Provider value={ws}>
       <ConnectionStatus infoHolder={infoHolder} />
+      {commandErrors > 0 && (
+        <div className="connection-status lost" role="alert">{t('errors.commandFailed')}</div>
+      )}
       <Navbar infoHolder={infoHolder} />
       <Routes>
         <Route path="/" element={<ActiveBalloons infoHolder={infoHolder} />} />

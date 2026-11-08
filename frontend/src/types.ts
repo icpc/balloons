@@ -61,7 +61,7 @@ export type Event
     | { type: 'balloonUpdated', balloon: Balloon }
     | { type: 'balloonDeleted', runId: string };
 
-export type WebSocketMessage = Event | State;
+export type WebSocketMessage = Event | State | { error: string };
 
 export type Command
   = | { type: 'takeBalloon', runId: string }

@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { GlobalError } from '../components/GlobalError';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import ProblemList from '../components/ProblemList';
 import BalloonList from '../components/BalloonList';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 import { useTranslation } from 'react-i18next';
 import { useContestMaps } from '../hooks/useContestMaps';
-import { Balloon, Team } from '../types';
+import { Balloon, Command, Team } from '../types';
 
 function teamId(balloon: Balloon, teamMap: Record<string, Team>): string {
   return teamMap[balloon.teamId]?.displayName ?? balloon.teamId;
@@ -37,6 +37,28 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
     return filteredBalloons.filter(balloon => balloon.takenBy !== null && !balloon.delivered);
   }, [filteredBalloons]);
 
+  const send = useCallback((type: Command['type'], runId: string) => {
+    ws?.send(JSON.stringify({ type, runId }));
+  }, [ws]);
+
+  const myActions = useCallback((balloon: Balloon) => (
+    <>
+      <a onClick={() => send('deliverBalloon', balloon.runId)}>{t('balloons.actions.done')}</a>
+      <a onClick={() => send('dropBalloon', balloon.runId)}>{t('balloons.actions.drop')}</a>
+    </>
+  ), [send, t]);
+
+  const queuedActions = useCallback((balloon: Balloon) => (
+    <a onClick={() => send('takeBalloon', balloon.runId)}>{t('balloons.actions.take')}</a>
+  ), [send, t]);
+
+  const takenActions = useCallback((balloon: Balloon) => (
+    <span>
+      {t('balloons.carriedBy')}
+      {balloon.takenBy}
+    </span>
+  ), [t]);
+
   return (
     <main className="balloons-main">
       <h2 className="sr-only">{t('balloons.title')}</h2>
@@ -46,37 +68,19 @@ const BalloonsView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         title={t('balloons.youCarry')}
         balloons={myBalloons}
         contest={contest}
-        actions={balloon => (
-          <>
-            <a onClick={() => ws?.send(JSON.stringify({ type: 'deliverBalloon', runId: balloon.runId }))}>
-              {t('balloons.actions.done')}
-            </a>
-            <a onClick={() => ws?.send(JSON.stringify({ type: 'dropBalloon', runId: balloon.runId }))}>
-              {t('balloons.actions.drop')}
-            </a>
-          </>
-        )}
+        actions={myActions}
       />
       <BalloonList
         title={t('balloons.available')}
         balloons={queuedBalloons}
         contest={contest}
-        actions={balloon => (
-          <a onClick={() => ws?.send(JSON.stringify({ type: 'takeBalloon', runId: balloon.runId }))}>
-            {t('balloons.actions.take')}
-          </a>
-        )}
+        actions={queuedActions}
       />
       <BalloonList
         title={t('balloons.inProgress')}
         balloons={takenBalloons}
         contest={contest}
-        actions={balloon => (
-          <span>
-            {t('balloons.carriedBy')}
-            {balloon.takenBy}
-          </span>
-        )}
+        actions={takenActions}
       />
     </main>
   );

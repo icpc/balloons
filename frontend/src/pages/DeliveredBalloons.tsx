@@ -1,13 +1,14 @@
 import { Navigate } from 'react-router-dom';
 import { InfoHolder } from '../types';
 import { GlobalError } from '../components/GlobalError';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import ProblemList from '../components/ProblemList';
 import BalloonList from '../components/BalloonList';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useFilteredBalloons } from '../hooks/useFilteredBalloons';
 import { useTranslation } from 'react-i18next';
+import { Balloon } from '../types';
 
 const BalloonsView = () => {
   const { t } = useTranslation();
@@ -18,6 +19,13 @@ const BalloonsView = () => {
     return filteredBalloons.filter(balloon => balloon.delivered);
   }, [filteredBalloons]);
 
+  const deliveredActions = useCallback((balloon: Balloon) => (
+    <span>
+      {t('balloons.deliveredBy')}
+      {balloon.takenBy ?? ''}
+    </span>
+  ), [t]);
+
   return (
     <main className="balloons-main">
       <h2 className="sr-only">{t('balloons.deliveredTitle')}</h2>
@@ -27,12 +35,7 @@ const BalloonsView = () => {
         title={t('balloons.delivered')}
         balloons={deliveredBalloons}
         contest={contest}
-        actions={balloon => (
-          <span>
-            {t('balloons.deliveredBy')}
-            {balloon.takenBy ?? ''}
-          </span>
-        )}
+        actions={deliveredActions}
       />
     </main>
   );

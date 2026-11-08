@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo } from 'react';
 import { Balloon, Contest, Problem, Team } from '../types';
 import ProblemBox from './ProblemBox';
 import { useContestMaps } from '../hooks/useContestMaps';
@@ -10,26 +10,21 @@ const defaultProblem = (problemId: string): Problem => ({
   color: null,
 });
 
-const BalloonRow = ({ balloon, problem, team, actions }: {
+const BalloonRow = memo(({ balloon, problem, team, actions }: {
   balloon: Balloon
   problem?: Problem
   team?: Team
   actions: (balloon: Balloon) => React.ReactNode
-}) => {
-  const actionContent = actions(balloon);
-
-  const content = useMemo(() => (
-    <div className="balloon-row">
-      <ProblemBox problem={problem ?? defaultProblem(balloon.problemId)} />
-      {balloon.isFTS ? <span className="fts">★</span> : <span></span>}
-      <span className="team-place">{team?.displayName ?? balloon.teamId}</span>
-      <div className="actions">{actionContent}</div>
-      <span className="team-name">{team?.fullName ?? balloon.teamId}</span>
-    </div>
-  ), [balloon, problem, team, actionContent]);
-
-  return content;
-};
+}) => (
+  <div className="balloon-row">
+    <ProblemBox problem={problem ?? defaultProblem(balloon.problemId)} />
+    {balloon.isFTS ? <span className="fts">★</span> : <span></span>}
+    <span className="team-place">{team?.displayName ?? balloon.teamId}</span>
+    <div className="actions">{actions(balloon)}</div>
+    <span className="team-name">{team?.fullName ?? balloon.teamId}</span>
+  </div>
+));
+BalloonRow.displayName = 'BalloonRow';
 
 const BalloonList = ({ title, balloons, contest, actions }: {
   title: string

@@ -29,8 +29,9 @@ class EventStream(
     // When new subscriber arrives, they receive state at the time of connection, and all subsequent updates.
     // To avoid locking by slow clients, we extend buffer capacity of the flow. It may eat RAM.
     //
-    // You should never emit manually to [eventFlow] or update [state]. Always use [update] method that
-    // prevents concurrent modifications.
+    // You should never emit manually to [eventFlow] or update [state]. Always use [publish] while holding [mutex],
+    // and hold it across the whole read-DB-write sequence so a slower command can't publish a stale snapshot.
+    @Volatile
     private var state: State = State(Contest("", listOf(), listOf()), mapOf())
     private val eventFlow = MutableSharedFlow<Pair<State, Event>>(replay = 1, extraBufferCapacity = Int.MAX_VALUE)
 
@@ -81,37 +82,46 @@ class EventStream(
             throw NotImplementedError("${command::class.qualifiedName} command is not supported yet")
         }
 
-        val balloon = state.balloons[command.runId] ?: return false
+        return mutex.withLock {
+            val balloon = state.balloons[command.runId] ?: return false
 
-        val commandResult =
-            when (command) {
-                is TakeBalloon -> balloonRepository.reserveBalloon(balloon, volunteerId)
-                is DropBalloon -> balloonRepository.dropBalloon(balloon, volunteerId)
-                is DeliverBalloon -> balloonRepository.deliverBalloon(balloon, volunteerId)
+            val commandResult =
+                when (command) {
+                    is TakeBalloon -> balloonRepository.reserveBalloon(balloon, volunteerId)
+                    is DropBalloon -> balloonRepository.dropBalloon(balloon, volunteerId)
+                    is DeliverBalloon -> balloonRepository.deliverBalloon(balloon, volunteerId)
+                }
+
+            if (!commandResult) {
+                return false
             }
 
-        if (!commandResult) {
-            return false
+            val newBalloon = balloon.withDelivery()
+
+            if (balloon != newBalloon) {
+                publish(BalloonUpdated(newBalloon))
+            }
+
+            true
         }
-
-        val newBalloon = balloon.withDelivery()
-
-        if (balloon != newBalloon) {
-            update(BalloonUpdated(newBalloon))
-        }
-
-        return true
     }
 
     private suspend fun processContestInfo(contestInfo: ContestInfo) {
         val newContest = Contest(contestInfo)
 
-        if (newContest != state.contest) {
-            update(ContestUpdated(newContest))
+        mutex.withLock {
+            if (newContest != state.contest) {
+                publish(ContestUpdated(newContest))
+            }
         }
     }
 
-    private suspend fun processRun(runInfo: RunInfo) {
+    private suspend fun processRun(runInfo: RunInfo) =
+        mutex.withLock {
+            processRunLocked(runInfo)
+        }
+
+    private suspend fun processRunLocked(runInfo: RunInfo) {
         val runId = runInfo.id.value
         val isBalloon = !runInfo.isHidden && runInfo.result.isSolved() && !(runInfo.result as RunResult.ICPC).isAfterFirstOk
 
@@ -133,20 +143,20 @@ class EventStream(
                     logger.info { "Balloon for submission $runId is updated: was ${existingBalloon.isFTS}, now ${balloon.isFTS}" }
                 }
 
-                update(BalloonUpdated(balloon))
+                publish(BalloonUpdated(balloon))
             }
         } else if (existingBalloon != null) {
             // Extremely rare: possibly rejudge from OK to WA. We're removing a balloon.
             logger.info { "Balloon for submission $runId is recalled" }
-            update(BalloonDeleted(runId))
+            publish(BalloonDeleted(runId))
         }
     }
 
-    private suspend fun update(event: Event) =
-        mutex.withLock {
-            state = event.applyTo(state)
-            eventFlow.emit(state to event)
-        }
+    /** Must be called while holding [mutex]. */
+    private suspend fun publish(event: Event) {
+        state = event.applyTo(state)
+        eventFlow.emit(state to event)
+    }
 
     private fun RunResult.isSolved(): Boolean =
         when (this) {
@@ -179,11 +189,5 @@ data class ClientMessage(
         if (state != null && event != null) {
             throw IllegalArgumentException("Only one of state or event must be non-null")
         }
-    }
-}
-
-fun launchCDS(eventStream: EventStream) {
-    CoroutineScope(Job()).launch {
-        eventStream.consumeCds()
     }
 }

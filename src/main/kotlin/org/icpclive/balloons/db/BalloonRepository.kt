@@ -7,6 +7,7 @@ import org.icpclive.balloons.db.tables.references.VOLUNTEER
 import org.icpclive.balloons.event.Balloon
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.exception.IntegrityConstraintViolationException
 
 class BalloonRepository(
     private val jooq: DSLContext,
@@ -31,19 +32,23 @@ class BalloonRepository(
         balloon: Balloon,
         volunteerId: Long,
     ): Boolean =
-        jooq.mergeInto(BALLOON)
-            .using(jooq.selectOne())
-            .on(
-                BALLOON.PROBLEM_ID.eq(balloon.problemId),
-                BALLOON.TEAM_ID.eq(balloon.teamId),
-            )
-            .whenMatchedAnd(BALLOON.VOLUNTEER_ID.isNull.or(BALLOON.VOLUNTEER_ID.eq(volunteerId)))
-            .thenUpdate().set(BALLOON.VOLUNTEER_ID, volunteerId)
-            .whenNotMatchedThenInsert()
-            .set(BALLOON.PROBLEM_ID, balloon.problemId)
-            .set(BALLOON.TEAM_ID, balloon.teamId)
-            .set(BALLOON.VOLUNTEER_ID, volunteerId)
-            .awaitSingle() > 0
+        try {
+            jooq.mergeInto(BALLOON)
+                .using(jooq.selectOne())
+                .on(
+                    BALLOON.PROBLEM_ID.eq(balloon.problemId),
+                    BALLOON.TEAM_ID.eq(balloon.teamId),
+                )
+                .whenMatchedAnd(BALLOON.VOLUNTEER_ID.isNull.or(BALLOON.VOLUNTEER_ID.eq(volunteerId)))
+                .thenUpdate().set(BALLOON.VOLUNTEER_ID, volunteerId)
+                .whenNotMatchedThenInsert()
+                .set(BALLOON.PROBLEM_ID, balloon.problemId)
+                .set(BALLOON.TEAM_ID, balloon.teamId)
+                .set(BALLOON.VOLUNTEER_ID, volunteerId)
+                .awaitSingle() > 0
+        } catch (_: IntegrityConstraintViolationException) {
+            false
+        }
 
     /**
      * @return `true` if balloon was dropped, `false` otherwise

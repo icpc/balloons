@@ -1,9 +1,11 @@
 package org.icpclive.balloons.db
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.withContext
 import org.icpclive.balloons.db.tables.records.VolunteerRecord
 import org.icpclive.balloons.db.tables.references.VOLUNTEER
 import org.jooq.DSLContext
@@ -42,26 +44,29 @@ class VolunteerRepository(
         password: String,
         canAccess: Boolean,
         canManage: Boolean = false,
-    ): VolunteerRecord? =
-        jooq.selectFrom(
+    ): VolunteerRecord? {
+        val passwordHash = getHash(password)
+        return jooq.selectFrom(
             DSL.finalTable(
                 DSL.mergeInto(VOLUNTEER)
                     .using(jooq.selectOne())
                     .on(VOLUNTEER.LOGIN.eq(login))
                     .whenNotMatchedThenInsert()
                     .set(VOLUNTEER.LOGIN, login)
-                    .set(VOLUNTEER.PASSWORD_HASH, getHash(password))
+                    .set(VOLUNTEER.PASSWORD_HASH, passwordHash)
                     .set(VOLUNTEER.CAN_ACCESS, canAccess)
                     .set(VOLUNTEER.CAN_MANAGE, canManage),
             ),
         ).awaitFirstOrNull()
+    }
 
     suspend fun setPassword(
         id: Long,
         password: String,
     ) {
+        val passwordHash = getHash(password)
         jooq.update(VOLUNTEER)
-            .set(VOLUNTEER.PASSWORD_HASH, getHash(password))
+            .set(VOLUNTEER.PASSWORD_HASH, passwordHash)
             .where(VOLUNTEER.ID.eq(id))
             .awaitSingle()
     }
@@ -87,5 +92,6 @@ class VolunteerRepository(
         jooq.deleteFrom(VOLUNTEER).where(VOLUNTEER.ID.eq(id)).awaitSingle()
     }
 
-    private fun getHash(password: String): String = bcryptHasher.hashToString(BCRYPT_COST, password.toCharArray())
+    private suspend fun getHash(password: String): String =
+        withContext(Dispatchers.IO) { bcryptHasher.hashToString(BCRYPT_COST, password.toCharArray()) }
 }

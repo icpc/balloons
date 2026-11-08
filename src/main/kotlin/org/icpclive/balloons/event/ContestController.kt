@@ -11,6 +11,7 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.icpclive.balloons.BalloonOptions
@@ -18,6 +19,7 @@ import org.icpclive.balloons.Language
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.auth.WebSocketAuthenticator
 import org.icpclive.cds.util.getLogger
+import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 data class UserInfo(
@@ -56,7 +58,7 @@ fun Route.contestController(
     webSocket("/api/balloons") {
         val principal =
             try {
-                webSocketAuthenticator.authenticate(this)
+                withTimeoutOrNull(AUTH_TIMEOUT) { webSocketAuthenticator.authenticate(this@webSocket) }
             } catch (_: ClosedReceiveChannelException) {
                 return@webSocket
             }
@@ -100,5 +102,6 @@ fun Route.contestController(
     }
 }
 
+private val AUTH_TIMEOUT = 10.seconds
 private val logger by getLogger()
 private val jsonSerializer = Json { encodeDefaults = true }

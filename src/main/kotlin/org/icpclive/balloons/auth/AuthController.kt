@@ -10,6 +10,8 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.icpclive.balloons.db.SecretKeyRepository
 import org.icpclive.balloons.db.VolunteerRepository
@@ -49,7 +51,9 @@ fun Route.authController(
             return@post
         }
 
-        if (!bcryptVerifier.verify(credentials.password.toCharArray(), volunteer.passwordHash).verified) {
+        val verified =
+            withContext(Dispatchers.IO) { bcryptVerifier.verify(credentials.password.toCharArray(), volunteer.passwordHash).verified }
+        if (!verified) {
             call.respond(HttpStatusCode.Forbidden)
             return@post
         }

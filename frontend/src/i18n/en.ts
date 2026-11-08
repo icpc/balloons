@@ -60,6 +60,7 @@ export default {
     contactAdmin: 'Contact the administrator with your username to get access.',
     notAdmin: 'You are not an administrator.',
     pageNotFound: 'Page not found.',
+    commandFailed: 'Action failed: the balloon was probably taken by someone else.',
   },
   standings: {
     title: 'Standings',
