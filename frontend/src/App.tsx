@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import VolunteerAccess from './pages/VolunteerAccess';
+import Volunteers from './pages/Volunteers';
 import ActiveBalloons from './pages/ActiveBalloons';
 import { GlobalError } from './components/GlobalError';
 import { Provider } from 'react-redux';
@@ -16,7 +16,6 @@ import { setContest } from './store/contestSlice';
 import { updateBalloon, deleteBalloon, setBalloons } from './store/balloonsSlice';
 import { WebSocketContext } from './contexts/WebSocketContext';
 import DeliveredBalloons from './pages/DeliveredBalloons';
-import VolunteerRating from './pages/VolunteerRating';
 import Standings from './pages/Standings';
 import ConnectionStatus from './components/ConnectionStatus';
 import { useTranslation } from 'react-i18next';
@@ -205,8 +204,7 @@ function AppContent() {
         <Route path="/" element={<ActiveBalloons infoHolder={infoHolder} />} />
         <Route path="/delivered" element={<DeliveredBalloons infoHolder={infoHolder} />} />
         <Route path="/standings" element={<Standings infoHolder={infoHolder} />} />
-        <Route path="/rating" element={<VolunteerRating infoHolder={infoHolder} />} />
-        <Route path="/access" element={<VolunteerAccess infoHolder={infoHolder} />} />
+        <Route path="/volunteers" element={<Volunteers infoHolder={infoHolder} />} />
         <Route path="/login" element={<Login infoHolder={infoHolder} />} />
         <Route path="/register" element={<Register infoHolder={infoHolder} />} />
         <Route

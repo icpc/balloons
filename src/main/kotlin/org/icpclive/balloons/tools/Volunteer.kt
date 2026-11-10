@@ -85,8 +85,8 @@ object UpdateVolunteer : CliktCommand("update") {
                 logger.info { "Password for volunteer $login updated" }
             }
             manage?.let {
-                volunteerRepository.updateFlags(volunteer.id!!, canManage = it)
-                logger.info { "Volunteer $login is admin now" }
+                volunteerRepository.updateFlags(volunteer.id!!, canAccess = if (it) true else null, canManage = it)
+                logger.info { "Volunteer $login is ${if (it) "admin now" else "not admin anymore"}" }
             }
         }
     }

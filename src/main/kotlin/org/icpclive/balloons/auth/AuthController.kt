@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.icpclive.balloons.db.SecretKeyRepository
 import org.icpclive.balloons.db.VolunteerRepository
+import org.icpclive.cds.util.getLogger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
@@ -94,8 +95,11 @@ fun Route.authController(
                 // User is self registering, no need to authenticate again
                 call.respond(mapOf("token" to getJWTToken(newVolunteer.id!!)))
             } else {
+                logger.info { "Manager ${principal.volunteer.login} created volunteer ${newVolunteer.login}" }
                 call.respond(HttpStatusCode.Created)
             }
         }
     }
 }
+
+private val logger by getLogger()

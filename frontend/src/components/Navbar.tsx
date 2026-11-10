@@ -35,10 +35,9 @@ const Navbar = ({ infoHolder }: { infoHolder: InfoHolder }) => {
                   <NavLink to="/">{t('navigation.queue')}</NavLink>
                   <NavLink to="/delivered">{t('navigation.delivered')}</NavLink>
                   <NavLink to="/standings">{t('navigation.standings')}</NavLink>
-                  <NavLink to="/rating">{t('navigation.volunteers')}</NavLink>
+                  <NavLink to="/volunteers">{t('navigation.volunteers')}</NavLink>
                 </>
               )}
-              {infoHolder.info.canManage && <NavLink to="/access">{t('navigation.access')}</NavLink>}
             </>
           )}
     </nav>

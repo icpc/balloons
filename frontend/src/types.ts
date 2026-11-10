@@ -17,9 +17,10 @@ export interface Info {
 export interface Volunteer {
   id: number
   login: string
-  canAccess: boolean
-  canManage: boolean
+  role: Role
 };
+
+export type Role = 'PENDING' | 'VOLUNTEER' | 'MANAGER';
 
 export interface Problem {
   id: string
