@@ -134,14 +134,14 @@ tasks {
     }
 
     processResources {
-        if (project.properties["balloons.embedFrontend"] == "true") {
+        if (providers.gradleProperty("balloons.embedFrontend").orNull == "true") {
             from(project(":frontend").tasks.named("pnpm_run_build")) {
                 into("frontend")
             }
         }
     }
 
-    val emptyJson by registering {
+    val emptyJson = register("emptyJson") {
         val file = project.layout.buildDirectory.file("empty.json")
         outputs.file(file)
         doLast {
@@ -149,7 +149,7 @@ tasks {
         }
     }
 
-    val emptyJsonArray by registering {
+    val emptyJsonArray = register("emptyJsonArray") {
         val file = project.layout.buildDirectory.file("empty-array.json")
         outputs.file(file)
         doLast {
