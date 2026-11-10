@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "org.icpclive.balloons"
-version = "1.1.0"
+version = "1.2.0"
 
 kotlin {
     jvmToolchain(21)
@@ -93,8 +93,7 @@ tasks.register<Exec>("downloadLive") {
     group = "release"
 
     val repoUrl = "https://github.com/icpc/live-v3.git"
-    // FIXME after live release
-    // val tag = "v" + libs.versions.live.get()
+    val tag = "v" + libs.versions.live.get()
     val targetDirectory = "build/live"
 
     doFirst {
@@ -103,7 +102,7 @@ tasks.register<Exec>("downloadLive") {
 
     commandLine(
         "git", "clone", "--depth", "1",
-        // "--branch", tag,
+        "--branch", tag,
         repoUrl, targetDirectory
     )
 
