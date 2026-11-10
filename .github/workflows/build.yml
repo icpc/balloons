@@ -43,5 +43,12 @@ jobs:
           retention-days: 14
           compression-level: 0
 
-      - name: Lint
+      - name: Lint backend
         run: ./gradlew --no-daemon -Pnpm.download=false lintKotlin
+
+      - name: Lint frontend
+        working-directory: ./frontend
+        run: pnpm exec eslint .
+
+      - name: Test
+        run: ./gradlew --no-daemon -Pnpm.download=false test

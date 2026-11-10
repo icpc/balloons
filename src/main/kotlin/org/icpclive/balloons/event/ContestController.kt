@@ -16,7 +16,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.icpclive.balloons.BalloonOptions
 import org.icpclive.balloons.Language
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.auth.WebSocketAuthenticator
@@ -36,14 +35,15 @@ data class UserInfo(
 fun Route.contestController(
     eventStream: EventStream,
     webSocketAuthenticator: WebSocketAuthenticator,
-    settings: BalloonOptions,
+    lang: Language,
+    disableRegistration: Boolean,
 ) {
     authenticate(optional = true) {
         get("/api/info") {
             val principal = call.principal<VolunteerPrincipal>()
 
             if (principal == null) {
-                call.respond(UserInfo(canRegister = !settings.disableRegistration, language = settings.lang))
+                call.respond(UserInfo(canRegister = !disableRegistration, language = lang))
             } else {
                 val volunteer = principal.volunteer
                 call.respond(
@@ -51,7 +51,7 @@ fun Route.contestController(
                         login = volunteer.login,
                         canAccess = volunteer.canAccess,
                         canManage = volunteer.canManage,
-                        language = settings.lang,
+                        language = lang,
                     ),
                 )
             }

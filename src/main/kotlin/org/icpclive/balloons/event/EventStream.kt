@@ -3,6 +3,7 @@ package org.icpclive.balloons.event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
@@ -11,19 +12,18 @@ import kotlinx.coroutines.sync.withLock
 import org.icpclive.balloons.db.BalloonRepository
 import org.icpclive.balloons.db.tables.references.BALLOON
 import org.icpclive.balloons.db.tables.references.VOLUNTEER
+import org.icpclive.cds.ContestUpdate
 import org.icpclive.cds.InfoUpdate
 import org.icpclive.cds.RunUpdate
-import org.icpclive.cds.adapters.addComputedData
 import org.icpclive.cds.api.ContestInfo
 import org.icpclive.cds.api.RunInfo
 import org.icpclive.cds.api.RunResult
-import org.icpclive.cds.cli.CdsCommandLineOptions
 import org.icpclive.cds.util.getLogger
 import kotlin.getValue
 
 class EventStream(
     private val balloonRepository: BalloonRepository,
-    settings: CdsCommandLineOptions,
+    private val cds: Flow<ContestUpdate>,
 ) {
     // We maintain current [state] of the contest, and [eventFlow] with updates to that state.
     // When new subscriber arrives, they receive state at the time of connection, and all subsequent updates.
@@ -36,8 +36,6 @@ class EventStream(
     private val eventFlow = MutableSharedFlow<Pair<State, Event>>(replay = 1, extraBufferCapacity = Int.MAX_VALUE)
 
     private val mutex = Mutex()
-
-    private val cds = settings.toFlow().addComputedData()
 
     suspend fun consumeCds() {
         cds.buffer(capacity = UNLIMITED).collect { event ->

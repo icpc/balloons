@@ -56,7 +56,10 @@ fun Route.adminController(volunteerRepository: VolunteerRepository) {
 
             val request = call.receive<NewVolunteer>()
             if (request.login.isBlank() || request.password.length < MIN_PASSWORD_LENGTH) {
-                call.respond(HttpStatusCode.BadRequest, "Login must not be blank, password must have at least $MIN_PASSWORD_LENGTH characters")
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Login must not be blank, password must have at least $MIN_PASSWORD_LENGTH characters",
+                )
                 return@post
             }
 
