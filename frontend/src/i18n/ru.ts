@@ -71,9 +71,8 @@ export default {
     updateError: 'Не удалось сохранить изменения',
     noDeliveredBalloons: 'Нет доставленных шариков',
     login: 'Волонтёр',
-    delivered: 'Шарики',
+    delivered: '🎈',
     role: 'Роль',
-    actions: 'Действия',
     sortBy: 'Сортировать по',
     sort: {
       role: 'роли',

@@ -55,14 +55,14 @@ const RatingView = () => {
       <thead>
         <tr>
           <th>{t('volunteers.login')}</th>
-          <th>{t('volunteers.delivered')}</th>
+          <th className="delivered">{t('volunteers.delivered')}</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(row => (
           <tr key={row.login}>
             <td>{row.login}</td>
-            <td>{row.count}</td>
+            <td className="delivered">{row.count}</td>
           </tr>
         ))}
       </tbody>
@@ -200,16 +200,16 @@ const ManageView = ({ infoHolder }: { infoHolder: InfoHolder }) => {
         <thead>
           <tr>
             <th>{t('volunteers.login')}</th>
-            <th>{t('volunteers.delivered')}</th>
+            <th className="delivered">{t('volunteers.delivered')}</th>
             <th>{t('volunteers.role')}</th>
-            <th>{t('volunteers.actions')}</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {rows.map(row => (
             <tr key={row.id}>
               <td>{row.login}</td>
-              <td>{row.count}</td>
+              <td className="delivered">{row.count}</td>
               <td>{t(`volunteers.roles.${row.role}`)}</td>
               <td>
                 {row.role === 'PENDING'

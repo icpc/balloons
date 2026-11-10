@@ -71,9 +71,8 @@ export default {
     updateError: 'Failed to save changes',
     noDeliveredBalloons: 'No balloons have been delivered yet',
     login: 'Volunteer',
-    delivered: 'Delivered',
+    delivered: '🎈',
     role: 'Role',
-    actions: 'Actions',
     sortBy: 'Sort by',
     sort: {
       role: 'role',

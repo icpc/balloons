@@ -179,11 +179,9 @@ dialog select {
   padding-right: 0;
 }
 
-@media (max-width: 480px) {
-  .sort,
-  .volunteers {
-    font-size: 0.85em;
-  }
+th.delivered,
+td.delivered {
+  text-align: center;
 }
 
 .volunteers td:first-child {
