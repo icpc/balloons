@@ -9,16 +9,19 @@ import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.icpclive.balloons.BalloonOptions
 import org.icpclive.balloons.Language
 import org.icpclive.balloons.auth.VolunteerPrincipal
 import org.icpclive.balloons.auth.WebSocketAuthenticator
 import org.icpclive.cds.util.getLogger
+import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
 @Serializable
@@ -61,10 +64,13 @@ fun Route.contestController(
                 withTimeoutOrNull(AUTH_TIMEOUT) { webSocketAuthenticator.authenticate(this@webSocket) }
             } catch (_: ClosedReceiveChannelException) {
                 return@webSocket
+            } catch (_: IOException) {
+                return@webSocket
             }
 
         if (principal == null) {
             send("""{"error": "access denied"}""")
+            cancel()
             return@webSocket
         }
 
@@ -93,9 +99,11 @@ fun Route.contestController(
                 }
             }
         } catch (_: ClosedReceiveChannelException) {
-        } catch (exc: Exception) {
-            logger.warning { "WebSocket exception: ${exc.localizedMessage}" }
-            throw exc
+        } catch (exc: IOException) {
+            logger.info { "WebSocket of ${principal.volunteer.login} closed: ${exc.message}" }
+            cancel()
+        } catch (exc: SerializationException) {
+            logger.warning { "Bad command from ${principal.volunteer.login}: ${exc.message}" }
         } finally {
             outgoingStream.cancel()
         }

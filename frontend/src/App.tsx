@@ -25,6 +25,7 @@ import i18n from './i18n/config';
 const RECONNECT_DELAY = 1000;
 const RECONNECT_JITTER = 4000;
 const COMMAND_ERROR_TTL = 3000;
+const STALE_AFTER_HIDDEN = 10000;
 
 function AppContent() {
   const { t } = useTranslation();
@@ -132,11 +133,7 @@ function AppContent() {
       return;
     }
 
-    const websocket = createWebSocket();
-    wsRef.current = websocket;
-    setWs(websocket);
-
-    return () => {
+    const closeCurrent = () => {
       const current = wsRef.current;
       if (current) {
         // Do not reconnect here.
@@ -144,6 +141,34 @@ function AppContent() {
         current.close();
       }
       wsRef.current = null;
+    };
+
+    const open = () => {
+      const websocket = createWebSocket();
+      wsRef.current = websocket;
+      setWs(websocket);
+    };
+
+    let hiddenAt: number | undefined;
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAt = Date.now();
+        return;
+      }
+      if (hiddenAt === undefined || Date.now() - hiddenAt < STALE_AFTER_HIDDEN) {
+        return;
+      }
+      hiddenAt = undefined;
+      closeCurrent();
+      open();
+    };
+
+    open();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      closeCurrent();
       if (reconnectTimeoutRef.current) {
         window.clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = undefined;
